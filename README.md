@@ -1,6 +1,9 @@
 # QLIT 小助手
 
-齐鲁工业大学校园助手——课表 + 校园工具，Kotlin Multiplatform / Compose Multiplatform，Android、iOS 共用一套 UI 与业务代码。
+**花有重开日，人无再少年。**
+介于学校态度，本人将不再维护本项目，现在此开源全部代码，包括前后端以及app源码。
+
+齐鲁理工学院校园助手——课表 + 校园工具，Kotlin Multiplatform / Compose Multiplatform，Android、iOS 共用一套 UI 与业务代码。
 
 ## 功能
 
@@ -41,9 +44,6 @@ ui-audit/        真机界面审计截图
 
 ABI 只出 `arm64-v8a`，minSdk 31 / targetSdk 37。
 
-## 仓库
-
-`KevinXu07/QLIT_assistant`，历史为单一初始提交（公开版抹去了开发过程与内部资料）。
 
 ## 许可
 
