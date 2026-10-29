@@ -1,0 +1,24 @@
+{
+  "name": "qlit-promo",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "studio": "remotion studio",
+    "music": "node music/make-music.mjs",
+    "render": "remotion render Promo out/qlit-promo.mp4"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.537",
+    "@remotion/paths": "4.0.537",
+    "@remotion/transitions": "4.0.537",
+    "@remotion/motion-blur": "4.0.537",
+    "remotion": "4.0.537",
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
+  },
+  "devDependencies": {
+    "@types/react": "19.1.0",
+    "typescript": "5.8.3"
+  }
+}

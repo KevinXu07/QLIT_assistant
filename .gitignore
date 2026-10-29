@@ -1,0 +1,55 @@
+*.iml
+.gradle
+/local.properties
+/.idea
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+
+# 构建产物
+/build
+/androidApp/build
+/androidApp/release
+/composeApp/build
+/composeApp/release
+/captures
+.externalNativeBuild
+.cxx
+
+# Kotlin / Gradle 项目内缓存
+/.kotlin
+/.gradle-user-home
+local.properties
+
+# 反编译/逆向资料（体积大，单独归档，不进版本库）
+/docs
+/docs/hydream dex/
+
+# 本地工具配置
+/.claude
+
+# 本地备份/打包文件
+/app/src.zip
+
+# ZCode 会话本地文件
+.zcode/
+
+# 本地参考用的外部仓库检出
+SukiSU-Ultra/
+
+# 本地构建验证产物
+composeApp/build-verify/
+build-verify/
+
+# 本地发布的安装包
+/dist
+*.apk
+
+# promo 宣传页（Next.js/Remotion）依赖与构建产物
+promo/node_modules/
+promo/out/
+promo/.next/

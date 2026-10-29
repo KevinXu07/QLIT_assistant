@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 所有组件声明(活动/服务/Provider/权限)都在 :composeApp 库的清单里,
+     打包时经 manifest merger 合并进来。 -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application />
+</manifest>

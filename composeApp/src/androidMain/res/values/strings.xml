@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">QLIT小助手</string>
+    <string name="widget_name">今日概览</string>
+    <string name="widget_description">今日课程、电费、待办与取件一览</string>
+</resources>

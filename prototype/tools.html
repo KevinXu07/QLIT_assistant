@@ -1,0 +1,1192 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QLIT 小助手 · 工具子页重设计方案</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+@font-face { font-family: "Barlow Local"; font-weight: 500; src: url("../website/assets/fonts/barlow-semi-condensed-500.woff2") format("woff2"); }
+@font-face { font-family: "Barlow Local"; font-weight: 600; src: url("../website/assets/fonts/barlow-semi-condensed-600.woff2") format("woff2"); }
+@font-face { font-family: "Barlow Local"; font-weight: 700; src: url("../website/assets/fonts/barlow-semi-condensed-700.woff2") format("woff2"); }
+:root {
+  --num: "Barlow Semi Condensed", "Barlow Local", "DIN Alternate", system-ui, sans-serif;
+  --cjk: system-ui, "PingFang SC", "MiSans", "HarmonyOS Sans SC", "OPPO Sans", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  --mono: ui-monospace, "Cascadia Mono", "JetBrains Mono", Consolas, monospace;
+  --ease-out: cubic-bezier(.32, .72, 0, 1);
+}
+[data-theme="light"] {
+  --page: #E3E0DA; --bg: #F3F1EC; --surface: #FFFFFF; --surface-2: #EBE8E2;
+  --ink: #1D1B18; --ink-2: #6B665E; --ink-3: #A39D93; --line: rgba(29, 27, 24, .08);
+  --seal: #C8161D; --seal-soft: rgba(200, 22, 29, .1);
+  --glass: rgba(255, 255, 255, .62); --glass-edge: rgba(255, 255, 255, .85);
+  --glass-shadow: 0 8px 28px rgba(60, 40, 20, .14), 0 1px 2px rgba(60, 40, 20, .08);
+  --scrim: rgba(20, 16, 12, .32);
+  --tint-l: .93; --tint-c: .05; --glyph-l: .52; --glyph-c: .15;
+  --cb-l: .935; --cb-c: .042; --ct-l: .36; --ct-c: .085;
+}
+[data-theme="dark"] {
+  --page: #0A0A09; --bg: #141312; --surface: #1F1D1B; --surface-2: #2B2825;
+  --ink: #F2EFEA; --ink-2: #A8A29A; --ink-3: #6E6962; --line: rgba(255, 255, 255, .07);
+  --seal: #CC2A31; --seal-soft: rgba(230, 70, 76, .16);
+  --glass: rgba(44, 41, 38, .62); --glass-edge: rgba(255, 255, 255, .1);
+  --glass-shadow: 0 8px 28px rgba(0, 0, 0, .5);
+  --scrim: rgba(0, 0, 0, .5);
+  --tint-l: .3; --tint-c: .055; --glyph-l: .8; --glyph-c: .12;
+  --cb-l: .31; --cb-c: .05; --ct-l: .9; --ct-c: .05;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { font-family: var(--cjk); background: var(--page); color: var(--ink); -webkit-font-smoothing: antialiased; transition: background-color .3s; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+input { font: inherit; color: inherit; }
+button:focus-visible, [tabindex]:focus-visible, input:focus-visible { outline: 2px solid var(--seal); outline-offset: 2px; border-radius: 8px; }
+.num { font-family: var(--num); font-variant-numeric: tabular-nums; letter-spacing: 0; }
+svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+/* ================= deck (prototype page) ================= */
+.deck-head { max-width: 1180px; margin: 0 auto; padding: 36px 28px 8px; display: flex; flex-wrap: wrap; gap: 16px 32px; align-items: end; justify-content: space-between; }
+.deck-head h1 { font-size: 26px; font-weight: 700; margin: 0 0 6px; }
+.deck-head p { margin: 0; color: var(--ink-2); font-size: 14px; line-height: 1.7; max-width: 680px; }
+.seg { display: inline-flex; flex-wrap: wrap; gap: 2px; background: var(--surface-2); border-radius: 999px; padding: 3px; }
+.seg button { padding: 6px 13px; border-radius: 999px; font-size: 13px; color: var(--ink-2); white-space: nowrap; }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+.rules { max-width: 1180px; margin: 22px auto 0; padding: 0 28px; display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+.rule { background: var(--bg); border-radius: 20px; padding: 16px 18px; font-size: 13.5px; line-height: 1.65; color: var(--ink-2); }
+.rule b { display: block; color: var(--ink); font-size: 15px; margin-bottom: 4px; }
+.rule .num { color: var(--ink-3); font-size: 13px; font-weight: 600; margin-right: 6px; }
+.toolnav { position: sticky; top: 0; z-index: 50; max-width: 1180px; margin: 22px auto 0; padding: 10px 28px; display: flex; gap: 8px; flex-wrap: wrap; background: var(--page); }
+.toolnav a { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px 6px 6px; border-radius: 999px; background: var(--bg); color: var(--ink); text-decoration: none; font-size: 14px; font-weight: 600; }
+.toolnav a .ticon { width: 28px; height: 28px; border-radius: 50%; }
+.toolnav a .ticon svg { width: 16px; height: 16px; }
+.toolnav .note { margin-left: auto; align-self: center; font-size: 12.5px; color: var(--ink-3); }
+.tool { max-width: 1180px; margin: 0 auto; padding: 48px 28px; display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: 28px 56px; align-items: start; }
+.tool + .tool { border-top: 1px solid var(--line); }
+.tool { scroll-margin-top: 56px; }
+.tool-text { position: sticky; top: 72px; }
+.kicker { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; color: var(--ink-2); }
+.kicker .num { color: var(--ink-3); }
+.kicker .ticon { width: 34px; height: 34px; border-radius: 10px; }
+.kicker .ticon svg { width: 19px; height: 19px; }
+.tool-text h2 { margin: 12px 0 14px; font-size: 28px; line-height: 1.3; }
+.tool-text > p { margin: 0 0 18px; font-size: 14.5px; line-height: 1.75; color: var(--ink-2); }
+.notes { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.notes li { position: relative; padding: 12px 14px 12px 40px; background: var(--bg); border-radius: 16px; font-size: 13.5px; line-height: 1.65; color: var(--ink-2); }
+.notes li::before { content: attr(data-k); position: absolute; left: 14px; top: 12px; font-family: var(--num); font-weight: 600; color: var(--ink-3); }
+.notes li b { color: var(--ink); font-weight: 600; }
+.notes li.change { box-shadow: inset 0 0 0 1.5px var(--seal-soft); }
+.notes li.change::after { content: "行为变化"; margin-left: 8px; padding: 1px 7px; border-radius: 999px; font-size: 11px; font-weight: 600; color: var(--seal); background: var(--seal-soft); }
+.demo { display: flex; flex-direction: column; gap: 14px; align-items: center; }
+.demo .seg { justify-content: center; border-radius: 18px; max-width: 420px; }
+.demo .seg button { padding: 6px 10px; }
+.demo .hint { font-size: 12px; color: var(--ink-3); text-align: center; }
+@media (max-width: 900px) {
+  .tool { grid-template-columns: 1fr; }
+  .toolnav { position: static; }
+  .tool-text { position: static; }
+  .demo { order: -1; }
+}
+
+/* ================= phone ================= */
+.phone { position: relative; width: 390px; height: 844px; border-radius: 52px; overflow: hidden; background: var(--bg); isolation: isolate;
+  box-shadow: 0 0 0 10px #1a1918, 0 0 0 11px #3a3836, 0 30px 60px rgba(0,0,0,.25); transition: background-color .3s; }
+@media (max-width: 440px) {
+  .phone { width: 100vw; border-radius: 0; box-shadow: none; }
+  .tool { padding: 32px 0; }
+  .tool-text { padding: 0 20px; }
+  .demo .seg { flex-wrap: nowrap; max-width: calc(100vw - 16px); overflow-x: auto; scrollbar-width: none; }
+}
+.status { position: absolute; inset: 0 0 auto; height: 46px; z-index: 30; display: flex; align-items: center; justify-content: space-between; padding: 6px 30px 0 34px;
+  font-family: var(--num); font-weight: 600; font-size: 16px; pointer-events: none; background: var(--bg); transition: background-color .3s; }
+.phone.on-map .status { background: transparent; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,.4); }
+.phone.on-map.road .status { color: var(--ink); text-shadow: none; }
+.status .bars { display: flex; gap: 6px; align-items: center; }
+.status .bars i { display: block; background: currentColor; border-radius: 2px; }
+.gesture { position: absolute; bottom: 8px; left: 50%; width: 132px; height: 5px; margin-left: -66px; border-radius: 3px; background: var(--ink); opacity: .85; z-index: 60; }
+.view { position: absolute; inset: 0; }
+.screen { position: absolute; inset: 46px 0 0; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; padding-bottom: 130px; }
+.screen::-webkit-scrollbar { display: none; }
+.screen.short { padding-bottom: 40px; }
+
+/* page header: back / collapsed title / actions, then large title */
+.pbar { position: sticky; top: 0; z-index: 10; height: 52px; display: grid; grid-template-columns: 96px 1fr 96px; align-items: center; padding: 0 10px; background: var(--bg); transition: background-color .3s; }
+.pbar .mini { text-align: center; font-size: 17px; font-weight: 650; opacity: 0; transition: opacity .2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.screen.scrolled .pbar .mini { opacity: 1; }
+.pbar .acts { display: flex; justify-content: flex-end; gap: 2px; }
+.ic { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; color: var(--ink); transition: background-color .15s; }
+.ic:hover { background: var(--line); }
+.ic[disabled] { opacity: .35; cursor: default; }
+.ptitle { margin: 0; padding: 2px 22px 0; font-size: 30px; font-weight: 700; line-height: 1.25; }
+.psub { margin: 4px 22px 0; font-size: 13.5px; color: var(--ink-2); }
+.ptitle + .body, .psub + .body { margin-top: 16px; }
+.body { display: flex; flex-direction: column; gap: 18px; }
+
+/* surfaces */
+.card { margin: 0 16px; background: var(--surface); border-radius: 24px; padding: 20px; position: relative; overflow: hidden; }
+.lbl { font-size: 13.5px; color: var(--ink-2); display: inline-flex; align-items: center; gap: 6px; }
+.meta { font-size: 12.5px; color: var(--ink-3); }
+.sum-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.big { display: flex; align-items: baseline; gap: 4px; margin-top: 4px; }
+.big .num { font-size: 56px; line-height: 1; font-weight: 600; }
+.big small { font-size: 15px; color: var(--ink-2); }
+.big.md .num { font-size: 44px; }
+.seal-t { color: var(--seal); }
+.where { margin: 8px 0 0; font-size: 13.5px; color: var(--ink-2); }
+.group { margin: 0 16px; }
+.group > h3 { display: flex; justify-content: space-between; align-items: baseline; margin: 0 8px 8px; font-size: 13px; font-weight: 500; color: var(--ink-2); }
+.group > h3 span { color: var(--ink-3); font-weight: 400; }
+.list { background: var(--surface); border-radius: 22px; overflow: hidden; }
+.row { display: flex; align-items: center; gap: 14px; width: 100%; min-height: 56px; padding: 12px 14px; text-align: left; position: relative; }
+button.row:hover, label.row:hover { background: var(--line); }
+.row + .row::before { content: ""; position: absolute; top: 0; left: 14px; right: 0; border-top: 1px solid var(--line); }
+.row.inset + .row::before, .row + .row.inset::before { left: 64px; }
+.row .tx { flex: 1; min-width: 0; }
+.row .tx b { display: block; font-size: 16px; font-weight: 550; }
+.row .tx > span { display: block; font-size: 13px; color: var(--ink-2); margin-top: 1px; }
+.row .val { font-size: 15px; color: var(--ink-2); white-space: nowrap; }
+.row .val .num { font-size: 18px; font-weight: 600; color: var(--ink); }
+.row > svg.i.chev { width: 18px; height: 18px; color: var(--ink-3); margin-left: -6px; }
+.row.dim { opacity: .5; }
+.ticon { position: relative; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 11px; flex: none;
+  background: oklch(var(--tint-l) var(--tint-c) var(--h)); color: oklch(var(--glyph-l) var(--glyph-c) var(--h)); }
+.ticon svg { width: 21px; height: 21px; }
+.chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap;
+  background: oklch(var(--cb-l) var(--cb-c) var(--h, 60)); color: oklch(var(--ct-l) var(--ct-c) var(--h, 60)); }
+.chip svg { width: 13px; height: 13px; stroke-width: 2.2; }
+.chip.ink { background: var(--surface-2); color: var(--ink-2); }
+.chip.seal { background: var(--seal-soft); color: var(--seal); }
+.foot { margin: -6px 24px 0; font-size: 12.5px; line-height: 1.6; color: var(--ink-3); }
+
+/* buttons */
+.btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 14px 18px; border-radius: 16px; font-size: 15.5px; font-weight: 600; transition: transform .12s var(--ease-out), opacity .15s; }
+.btn:active { transform: scale(.97); }
+.btn svg { width: 19px; height: 19px; }
+.btn.ink { background: var(--ink); color: var(--bg); }
+.btn.tonal { background: var(--surface-2); color: var(--ink); }
+.btn.seal { background: var(--seal); color: #fff; }
+.btn.sm { width: auto; padding: 8px 15px; border-radius: 999px; font-size: 14px; }
+.btn[disabled] { opacity: .35; cursor: default; transform: none; }
+.btn .spin { width: 17px; height: 17px; border-width: 2px; border-color: currentColor; border-right-color: transparent; }
+.tbtn { font-size: 14px; font-weight: 600; color: var(--ink); padding: 6px 2px; }
+.tbtn.seal { color: var(--seal); }
+.btnrow { display: flex; gap: 10px; }
+.btnrow .btn { flex: 1; }
+.dock { position: absolute; left: 0; right: 0; bottom: 0; z-index: 12; padding: 14px 16px 30px; background: linear-gradient(transparent, var(--bg) 22%); }
+.spin { display: inline-block; width: 22px; height: 22px; border-radius: 50%; border: 2.5px solid var(--ink-3); border-right-color: transparent; animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* inputs */
+.inp { display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 0 14px; position: relative; }
+.inp + .inp::before, .row + .inp::before, .inp + .row::before { content: ""; position: absolute; top: 0; left: 14px; right: 0; border-top: 1px solid var(--line); }
+.inp > span:first-child { width: 72px; flex: none; font-size: 15px; color: var(--ink-2); }
+.inp input { flex: 1; min-width: 0; height: 54px; border: 0; background: transparent; font-size: 16px; outline: none; }
+.inp input.num { font-size: 19px; font-weight: 600; }
+.inp input::placeholder { color: var(--ink-3); font-family: var(--cjk); font-weight: 400; font-size: 15px; }
+.inp .ic { width: 34px; height: 34px; color: var(--ink-3); }
+.inp .err { position: absolute; right: 14px; bottom: 4px; font-size: 11.5px; color: var(--seal); }
+.switch { appearance: none; -webkit-appearance: none; flex: none; width: 50px; height: 30px; border-radius: 999px; background: var(--surface-2); position: relative; cursor: pointer; transition: background-color .2s; margin: 0; }
+.switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.2); transition: transform .25s var(--ease-out); }
+.switch:checked { background: var(--ink); }
+.switch:checked::after { transform: translateX(20px); }
+[data-theme="dark"] .switch:checked::after { background: var(--bg); }
+input[type="range"] { width: 100%; accent-color: var(--ink); margin: 10px 0 2px; }
+
+/* notices */
+.notice { margin: 0 16px; display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: 18px; background: var(--surface); font-size: 13.5px; line-height: 1.6; color: var(--ink-2); }
+.notice > svg { width: 20px; height: 20px; margin-top: 1px; color: var(--ink-2); }
+.notice b { color: var(--ink); }
+.notice.seal { background: var(--seal-soft); color: var(--ink); }
+.notice.seal > svg { color: var(--seal); }
+.notice .btn { margin-top: 10px; }
+.empty { margin: 0 16px; padding: 34px 20px; text-align: center; color: var(--ink-3); font-size: 14px; line-height: 1.7; border: 1.5px dashed var(--line); border-radius: 22px; }
+.empty svg { width: 30px; height: 30px; color: var(--ink-3); margin-bottom: 6px; stroke-width: 1.5; }
+.sk { background: var(--surface-2); border-radius: 8px; position: relative; overflow: hidden; }
+.sk::after { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 30%, rgba(255,255,255,.35) 50%, transparent 70%); animation: sh 1.4s infinite; }
+[data-theme="dark"] .sk::after { background: linear-gradient(100deg, transparent 30%, rgba(255,255,255,.06) 50%, transparent 70%); }
+@keyframes sh { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+.pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--seal); box-shadow: 0 0 0 0 var(--seal-soft); animation: pl 2s ease-in-out infinite; flex: none; }
+@keyframes pl { 0% { box-shadow: 0 0 0 0 rgba(200,22,29,.35); } 70%, 100% { box-shadow: 0 0 0 8px rgba(200,22,29,0); } }
+
+/* overlays */
+.scrim { position: absolute; inset: 0; z-index: 40; background: var(--scrim); opacity: 0; pointer-events: none; transition: opacity .3s; }
+.sheet { position: absolute; left: 8px; right: 8px; bottom: 8px; z-index: 41; max-height: calc(100% - 70px); overflow-y: auto; scrollbar-width: none; border-radius: 34px; padding: 10px 22px 24px;
+  background: var(--surface); transform: translateY(110%); transition: transform .42s var(--ease-out); box-shadow: 0 -10px 40px rgba(0,0,0,.14); }
+.phone.sheet-open .scrim { opacity: 1; pointer-events: auto; }
+.phone.sheet-open .sheet { transform: none; }
+.sheet .grab { width: 38px; height: 5px; border-radius: 3px; background: var(--surface-2); margin: 0 auto 16px; }
+.sheet h2 { margin: 0; font-size: 22px; line-height: 1.3; }
+.sh-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.sh-sub { margin: 6px 0 0; font-size: 13.5px; color: var(--ink-2); line-height: 1.6; }
+.sheet .actions { display: flex; gap: 10px; margin-top: 22px; }
+.sheet .actions .btn { flex: 1; }
+.sheet .list { background: var(--bg); margin-top: 16px; }
+.kv { margin: 18px 0 0; display: grid; grid-template-columns: 76px 1fr; row-gap: 12px; font-size: 15px; }
+.kv dt { color: var(--ink-3); }
+.kv dd { margin: 0; }
+.kv dd .num { font-size: 17px; font-weight: 600; }
+.toast { position: absolute; left: 50%; bottom: 112px; z-index: 70; transform: translate(-50%, 12px); padding: 10px 18px; border-radius: 999px; background: var(--ink); color: var(--bg);
+  font-size: 14px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity .2s, transform .3s var(--ease-out); }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+.sec { display: flex; justify-content: space-between; align-items: baseline; margin: 6px 24px -8px; font-size: 13px; font-weight: 500; color: var(--ink-2); }
+.sec span { color: var(--ink-3); font-weight: 400; }
+
+/* ================= pickup ================= */
+.pkgs { display: flex; flex-direction: column; gap: 10px; margin: 0 16px; }
+.pkg { display: block; width: 100%; text-align: left; background: var(--surface); border-radius: 22px; padding: 16px 18px 15px; transition: transform .12s var(--ease-out); }
+.pkg:active { transform: scale(.98); }
+.pkg-top { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--ink-3); }
+.pkg-code { display: flex; align-items: center; justify-content: space-between; margin: 10px 0 8px; }
+.pkg-code .num { font-size: 38px; line-height: 1; font-weight: 700; letter-spacing: .01em; }
+.pkg-code svg { width: 20px; height: 20px; color: var(--ink-3); }
+.pkg-title { margin: 0; font-size: 14px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pkg-no { margin: 3px 0 0; font-size: 12.5px; color: var(--ink-3); }
+.pkg-no .num { font-size: 13.5px; }
+.sum .btn { margin-top: 18px; }
+.gate { text-align: left; }
+.gate .ticon { width: 46px; height: 46px; border-radius: 14px; }
+.gate h2 { margin: 16px 0 6px; font-size: 21px; }
+.gate p { margin: 0 0 18px; font-size: 14px; line-height: 1.65; color: var(--ink-2); }
+.web { margin-top: 16px; border-radius: 22px; overflow: hidden; background: var(--bg); box-shadow: inset 0 0 0 1px var(--line); }
+.web .url { display: flex; align-items: center; gap: 6px; padding: 10px 14px; font-size: 12px; color: var(--ink-3); border-bottom: 1px solid var(--line); }
+.web .url svg { width: 13px; height: 13px; }
+.web .pg { padding: 22px 20px 26px; display: grid; gap: 12px; }
+.web .loadbar { height: 2px; background: var(--ink); width: 60%; animation: lb 1.6s var(--ease-out) infinite; }
+@keyframes lb { from { width: 5%; } to { width: 92%; } }
+.idcard { margin-top: 18px; padding: 22px 18px 16px; border-radius: 22px; background: #fff; color: #111; text-align: center; box-shadow: inset 0 0 0 1px rgba(0,0,0,.06); }
+.idcard .bc { display: block; width: 100%; height: 92px; fill: #111; }
+.idcard .idnum { margin-top: 10px; font-size: 22px; font-weight: 600; letter-spacing: .12em; }
+
+/* ================= bath ================= */
+.live { display: flex; align-items: center; gap: 10px; margin: 0 16px; padding: 13px 16px; border-radius: 18px; background: var(--seal); color: #fff; font-size: 14.5px; font-weight: 600; text-align: left; }
+.live .pulse { background: #fff; animation: none; }
+.live .num { font-size: 17px; }
+.live svg { margin-left: auto; width: 18px; height: 18px; }
+.bal { display: flex; align-items: center; width: calc(100% - 32px); text-align: left; padding: 18px 16px 18px 20px; }
+.bal > div { flex: 1; }
+.bal .big .num { font-size: 40px; }
+.bal .big small:first-child { font-size: 20px; font-family: var(--num); font-weight: 600; color: var(--ink); }
+.bal > svg { color: var(--ink-3); width: 20px; height: 20px; }
+.area .occ { display: block; height: 4px; margin: 7px 0 2px; border-radius: 2px; background: var(--surface-2); overflow: hidden; width: 120px; }
+.area .occ i { display: block; height: 100%; border-radius: 2px; background: var(--ink-3); }
+.idle { display: flex; flex-direction: column; align-items: flex-end; min-width: 54px; }
+.idle b { font-family: var(--num); font-size: 30px; line-height: 1; font-weight: 600; }
+.idle small { font-size: 12px; color: var(--ink-3); margin-top: 2px; white-space: nowrap; }
+.idle.zero b { color: var(--ink-3); }
+.stats3 { display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; }
+.stats3 > div + div { box-shadow: -1px 0 0 var(--line); }
+.stats3 .num { display: block; font-size: 32px; font-weight: 600; line-height: 1.1; }
+.stats3 small { font-size: 12.5px; color: var(--ink-2); }
+.plan { padding: 18px 16px 16px; }
+.plan-h { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.plan-h b { font-size: 15px; }
+.legend { display: flex; gap: 10px; font-size: 11.5px; color: var(--ink-3); }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 4px; vertical-align: -1px; }
+.zone + .zone { margin-top: 14px; }
+.zone-name { font-size: 11.5px; color: var(--ink-3); margin: 0 0 6px 2px; }
+.prow { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+.aisle { text-align: center; font-size: 10.5px; color: var(--ink-3); letter-spacing: .6em; padding: 5px 0; }
+.cell { height: 34px; border-radius: 9px; display: grid; place-items: center; font-family: var(--num); font-size: 14px; font-weight: 600; background: var(--surface-2); color: var(--ink-3); }
+.cell.free { background: oklch(var(--cb-l) var(--cb-c) 220); color: oklch(var(--ct-l) var(--ct-c) 220); box-shadow: inset 0 0 0 1.5px oklch(.64 .1 220 / .5); cursor: pointer; }
+.cell.mine { background: var(--seal); color: #fff; }
+.cell.locker { background: transparent; border: 1.2px dashed var(--line); font-family: var(--cjk); font-size: 11px; font-weight: 500; }
+.dnum { width: 38px; height: 38px; border-radius: 11px; display: grid; place-items: center; font-family: var(--num); font-size: 18px; font-weight: 600; flex: none;
+  background: oklch(var(--cb-l) var(--cb-c) 220); color: oklch(var(--ct-l) var(--ct-c) 220); }
+.row.dim .dnum { background: var(--surface-2); color: var(--ink-3); }
+.ticket { margin: 0 16px; padding: 20px 20px 22px; border-radius: 28px; overflow: hidden; position: relative; background: var(--seal); color: #fff; box-shadow: 0 14px 30px -12px rgba(200, 22, 29, .55); }
+[data-theme="dark"] .ticket { box-shadow: none; }
+.ticket .seal-wm { position: absolute; width: 230px; height: 230px; right: -78px; top: -40px; color: #fff; opacity: .13; pointer-events: none; }
+.ticket .top { display: flex; justify-content: space-between; font-size: 13px; color: rgba(255,255,255,.85); }
+.tk-dev { display: flex; align-items: baseline; gap: 6px; margin-top: 14px; }
+.tk-dev .num { font-size: 64px; line-height: .9; font-weight: 700; }
+.tk-dev small { font-size: 17px; font-weight: 600; }
+.tk-count { display: flex; align-items: baseline; gap: 8px; margin-top: 22px; }
+.tk-count .num { font-size: 34px; font-weight: 600; line-height: 1; }
+.tk-count small { font-size: 14px; color: rgba(255,255,255,.85); }
+.tk-track { height: 6px; margin-top: 14px; border-radius: 3px; background: rgba(255,255,255,.2); overflow: hidden; }
+.tk-track i { display: block; height: 100%; background: rgba(255,255,255,.9); border-radius: 3px; transition: width 1s linear; }
+.ticket.expired { background: var(--surface-2); color: var(--ink-2); box-shadow: none; }
+.ticket.expired .top, .ticket.expired .tk-count small { color: var(--ink-3); }
+.qstats { display: grid; grid-template-columns: 1fr 1fr; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); }
+.qstats .num { display: block; font-size: 24px; font-weight: 600; }
+.qstats small { font-size: 12.5px; color: var(--ink-2); }
+.tabs2 { margin: 0 16px; display: grid; grid-template-columns: 1fr 1fr; background: var(--surface-2); border-radius: 14px; padding: 3px; }
+.tabs2 button { padding: 9px 0; border-radius: 11px; font-size: 14.5px; color: var(--ink-2); }
+.tabs2 button[aria-pressed="true"] { background: var(--surface); color: var(--ink); font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+.codebtn { flex: none; font-size: 14px; font-weight: 600; padding: 7px 12px; border-radius: 999px; background: var(--surface-2); white-space: nowrap; }
+.codebtn[disabled] { color: var(--ink-3); }
+.danger { color: var(--seal); }
+
+/* ================= mock location ================= */
+.map { position: absolute; inset: 0; cursor: crosshair; }
+.map svg { display: block; width: 100%; height: 100%; }
+.glass { background: var(--glass); -webkit-backdrop-filter: blur(20px) saturate(1.6); backdrop-filter: blur(20px) saturate(1.6); box-shadow: var(--glass-shadow), inset 0 0 0 1px var(--glass-edge); }
+.mapbar { position: absolute; top: 50px; left: 12px; right: 12px; z-index: 8; display: flex; justify-content: space-between; align-items: center; pointer-events: none; }
+.mapbar > * { pointer-events: auto; }
+.gbtn { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; color: var(--ink); }
+.gtitle { padding: 10px 18px; border-radius: 999px; font-size: 15px; font-weight: 650; }
+.maphint { position: absolute; top: 108px; left: 50%; transform: translateX(-50%); z-index: 8; padding: 9px 16px; border-radius: 999px; font-size: 13px; white-space: nowrap; color: var(--ink); }
+.panel { position: absolute; left: 0; right: 0; bottom: 0; z-index: 20; background: var(--surface); border-radius: 30px 30px 0 0; box-shadow: 0 -8px 30px rgba(0,0,0,.18); padding: 8px 0 30px; }
+.panel .grabber { display: block; width: 100%; height: 22px; }
+.panel .grabber::before { content: ""; display: block; width: 38px; height: 5px; border-radius: 3px; background: var(--surface-2); margin: 0 auto; }
+.psum { display: flex; align-items: center; gap: 14px; padding: 4px 20px 0; }
+.psum .tx { flex: 1; min-width: 0; }
+.psum .tx b { display: block; font-size: 19px; font-weight: 650; }
+.psum .tx > span { display: block; margin-top: 3px; font-size: 13.5px; color: var(--ink-2); }
+.psum .tx span .num { font-size: 15px; font-weight: 600; color: var(--ink); }
+.play { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; background: var(--ink); color: var(--bg); flex: none; transition: transform .12s var(--ease-out), opacity .15s; }
+.play:active { transform: scale(.94); }
+.play[disabled] { opacity: .3; }
+.play svg { width: 24px; height: 24px; fill: currentColor; stroke: none; }
+.play.stop svg { fill: currentColor; }
+.chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 16px 20px 2px; }
+.chips::-webkit-scrollbar { display: none; }
+.chips button { flex: none; padding: 8px 14px; border-radius: 999px; background: var(--surface-2); font-size: 14px; color: var(--ink-2); display: inline-flex; gap: 4px; align-items: center; }
+.chips button svg { width: 15px; height: 15px; }
+.chips button[aria-pressed="true"] { background: var(--ink); color: var(--bg); font-weight: 600; }
+.pmore { overflow: hidden; max-height: 0; transition: max-height .45s var(--ease-out); }
+.panel.open .pmore { max-height: 520px; }
+.pmore-in { padding: 18px 0 0; display: flex; flex-direction: column; gap: 16px; }
+.pmore-in .group .list { background: var(--bg); }
+.prm { padding: 14px 16px 10px; position: relative; }
+.prm + .prm::before { content: ""; position: absolute; top: 0; left: 16px; right: 0; border-top: 1px solid var(--line); }
+.prm-h { display: flex; justify-content: space-between; align-items: baseline; font-size: 15px; }
+.prm-h b { font-weight: 550; }
+.prm-h span { font-size: 13.5px; color: var(--ink-2); }
+.prm-h span .num { font-size: 17px; font-weight: 600; color: var(--ink); }
+.prm.flex { display: flex; align-items: center; gap: 12px; padding: 12px 16px; }
+.prm.flex .tx { flex: 1; }
+.prm.flex .tx b { display: block; font-size: 15px; font-weight: 550; }
+.prm.flex .tx span { font-size: 13px; color: var(--ink-2); }
+.stepper { display: flex; align-items: center; gap: 4px; background: var(--surface); border-radius: 999px; padding: 3px; }
+.stepper button { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; }
+.stepper button:hover { background: var(--line); }
+.stepper .num { width: 28px; text-align: center; font-size: 19px; font-weight: 600; }
+.edit3 { display: flex; gap: 8px; padding: 14px 20px 0; }
+.edit3 .btn { flex: 1; padding: 10px 0; font-size: 14px; border-radius: 14px; }
+.runsum { flex: 1; min-width: 0; }
+.runsum .livel { display: flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 600; color: var(--seal); }
+.runsum .big { margin-top: 6px; }
+.runsum .big .num { font-size: 44px; }
+.runstats { display: grid; grid-template-columns: repeat(3, 1fr); margin: 16px 20px 0; padding: 14px 0 0; border-top: 1px solid var(--line); }
+.runstats div { display: flex; flex-direction: column; }
+.runstats .num { font-size: 22px; font-weight: 600; }
+.runstats small { font-size: 12px; color: var(--ink-2); }
+.rbar { height: 5px; margin: 14px 20px 0; border-radius: 3px; background: var(--surface-2); overflow: hidden; }
+.rbar i { display: block; height: 100%; background: var(--ink); border-radius: 3px; }
+.panel .notice { margin: 4px 16px 14px; background: var(--seal-soft); color: var(--ink); }
+
+/* ================= travel ================= */
+.steps { list-style: none; margin: 0 16px; padding: 0; background: var(--surface); border-radius: 24px; }
+.step { position: relative; display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 14px; padding: 18px 18px 18px 16px; }
+.step + .step { border-top: 1px solid var(--line); }
+.sn { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-family: var(--num); font-size: 15px; font-weight: 600; box-shadow: inset 0 0 0 1.5px var(--ink-3); color: var(--ink-2); }
+.step.cur .sn { box-shadow: none; background: var(--ink); color: var(--bg); }
+.step.done .sn { box-shadow: none; background: var(--surface-2); color: var(--ink); }
+.step.done .sn svg { width: 16px; height: 16px; stroke-width: 2.4; }
+.step.todo { opacity: .5; }
+.sh { display: flex; justify-content: space-between; align-items: center; min-height: 30px; }
+.sh b { font-size: 16.5px; font-weight: 600; }
+.sb p { margin: 4px 0 0; font-size: 13.5px; line-height: 1.6; color: var(--ink-2); }
+.sb .list { background: var(--bg); margin-top: 14px; }
+.sb .btn { margin-top: 12px; }
+.fb { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 13px; color: var(--ink-2); }
+.fb .spin { width: 14px; height: 14px; border-width: 2px; }
+.fb.ok { color: var(--ink); }
+.fb.ok svg { width: 16px; height: 16px; stroke-width: 2.4; }
+.who { display: flex; align-items: center; gap: 14px; padding: 16px 18px; }
+.avatar { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--surface-2); font-size: 17px; font-weight: 650; flex: none; }
+.who b { display: block; font-size: 17px; }
+.who span { font-size: 13px; color: var(--ink-2); }
+.wait { margin: 40px 28px 8px; text-align: center; }
+.wait .spin { width: 40px; height: 40px; border-width: 3px; border-color: var(--ink); border-right-color: transparent; }
+.wait h2 { margin: 22px 0 8px; font-size: 22px; }
+.wait p { margin: 0; font-size: 14px; line-height: 1.7; color: var(--ink-2); }
+.howto { margin: 0 16px; padding: 4px 18px; background: var(--surface); border-radius: 22px; counter-reset: h; list-style: none; }
+.howto li { counter-increment: h; display: grid; grid-template-columns: 24px 1fr; gap: 10px; padding: 13px 0; font-size: 14px; line-height: 1.6; }
+.howto li + li { border-top: 1px solid var(--line); }
+.howto li::before { content: counter(h); font-family: var(--num); font-weight: 600; color: var(--ink-3); font-size: 16px; }
+.logtg { display: flex; align-items: center; gap: 4px; margin: 0 22px; font-size: 13.5px; color: var(--ink-2); }
+.logtg svg { width: 16px; height: 16px; transition: transform .2s; }
+.logtg.open svg { transform: rotate(180deg); }
+.log { margin: 0 16px; padding: 14px 16px; border-radius: 18px; background: var(--surface-2); font-family: var(--mono); font-size: 12px; line-height: 1.75; color: var(--ink-2); white-space: pre-wrap; }
+.result { margin: 72px 28px 0; text-align: center; }
+.rs { width: 72px; height: 72px; border-radius: 50%; display: grid; place-items: center; margin: 0 auto; background: var(--surface); }
+.rs svg { width: 34px; height: 34px; stroke-width: 2.2; }
+.rs.fail { background: var(--seal-soft); color: var(--seal); }
+.result h2 { margin: 22px 0 8px; font-size: 24px; }
+.result p { margin: 0; font-size: 14.5px; line-height: 1.7; color: var(--ink-2); }
+.wheel { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; position: relative; }
+.wheel::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 44px; margin-top: -22px; border-radius: 14px; background: var(--surface-2); z-index: 0; pointer-events: none; }
+.wcol { position: relative; z-index: 1; height: 220px; overflow-y: auto; scrollbar-width: none; scroll-snap-type: y mandatory; padding: 88px 0; }
+.wcol::-webkit-scrollbar { display: none; }
+.wcol button { display: block; width: 100%; height: 44px; scroll-snap-align: center; font-family: var(--num); font-size: 22px; font-weight: 600; color: var(--ink-3); }
+.wcol button.on { color: var(--ink); }
+.dgrid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 16px; text-align: center; }
+.dgrid .wd { font-size: 12px; color: var(--ink-3); padding-bottom: 4px; }
+.dgrid button { height: 44px; border-radius: 50%; font-family: var(--num); font-size: 18px; font-weight: 600; }
+.dgrid button.today { color: var(--seal); }
+.dgrid button.on { background: var(--ink); color: var(--bg); }
+.dgrid button[disabled] { color: var(--ink-3); opacity: .5; }
+.radio { width: 22px; height: 22px; border-radius: 50%; box-shadow: inset 0 0 0 1.8px var(--ink-3); flex: none; }
+.radio.on { box-shadow: inset 0 0 0 7px var(--ink); }
+.warns { margin-top: 16px; display: grid; gap: 8px; }
+.warns .notice { margin: 0; padding: 11px 14px; font-size: 13px; }
+
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; } }
+</style>
+</head>
+<body>
+
+<header class="deck-head">
+  <div>
+    <h1>工具子页重设计 · 方案</h1>
+    <p>把淘宝取件、浴室预约、模拟定位、出行登记四个子页按校徽红风格重做（电费、超星、余额流水、NFC 已经做完，保持不变）。每台手机都能点：切换上方状态，或直接在手机里操作。</p>
+  </div>
+  <div class="seg" id="themeSeg" role="group" aria-label="主题">
+    <button data-theme-v="light" aria-pressed="true">浅色</button><button data-theme-v="dark" aria-pressed="false">深色</button>
+  </div>
+</header>
+
+<section class="rules" aria-label="通用规则">
+  <div class="rule"><span class="num">01</span><b>一页先答一个问题</b>顶部一张卡放最关心的数：还有几件没取、还剩几分钟、已经跑了多远。</div>
+  <div class="rule"><span class="num">02</span><b>红色只给"此刻"和"要你去做的事"</b>待取件数、预约倒计时、正在模拟、重复登记提醒。按钮和开关一律墨色。</div>
+  <div class="rule"><span class="num">03</span><b>要读的数字用 Barlow</b>取件码、喷头号、倒计时、端口、时间都是大号等宽数字，扫一眼就能读、能报给别人。</div>
+  <div class="rule"><span class="num">04</span><b>次要操作进底部弹窗</b>身份码、预约确认、登录网页、时间选择、提交确认，都用同一种圆角弹窗。页面上不再堆开关和悬浮按钮。</div>
+  <div class="rule"><span class="num">05</span><b>每种状态都有样子</b>加载用骨架，空的、出错、要登录都有对应的卡片，不靠一闪而过的提示条。</div>
+</section>
+
+<nav class="toolnav" id="toolnav"></nav>
+
+<main id="tools"></main>
+
+<script>
+/* ---------------- icons ---------------- */
+const P = {
+  back: '<path d="m14.5 6-6 6 6 6"/>',
+  chevR: '<path d="m9.5 6 6 6-6 6"/>',
+  chevD: '<path d="m6 9.5 6 6 6-6"/>',
+  refresh: '<path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3"/><path d="M19.5 4.5v4h-4"/>',
+  more: '<path d="M6 12h.01M12 12h.01M18 12h.01" stroke-width="2.6"/>',
+  copy: '<rect x="8.5" y="8.5" width="11" height="11" rx="2.5"/><path d="M15.5 8.5V6A1.5 1.5 0 0 0 14 4.5H6A1.5 1.5 0 0 0 4.5 6v8A1.5 1.5 0 0 0 6 15.5h2.5"/>',
+  barcode: '<path d="M4 6v12M7 6v12M10.5 6v12M13 6v12M16.5 6v12M20 6v12"/>',
+  lock: '<rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/>',
+  eye: '<path d="M2.5 12s3.5-6.5 9.5-6.5S21.5 12 21.5 12s-3.5 6.5-9.5 6.5S2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/>',
+  eyeOff: '<path d="M2.5 12s3.5-6.5 9.5-6.5S21.5 12 21.5 12s-3.5 6.5-9.5 6.5S2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/><path d="M4 4l16 16"/>',
+  check: '<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+  close: '<path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  minus: '<path d="M5 12h14"/>',
+  play: '<path d="M8 5.5v13l10-6.5z"/>',
+  stop: '<rect x="6.5" y="6.5" width="11" height="11" rx="2"/>',
+  layers: '<path d="M12 3.5 3 8l9 4.5L21 8z"/><path d="m3 12.5 9 4.5 9-4.5"/><path d="m3 16.5 9 4.5 9-4.5"/>',
+  undo: '<path d="M9 14.5 4.5 10 9 5.5"/><path d="M4.5 10H14a5.5 5.5 0 0 1 0 11h-3"/>',
+  trash: '<path d="M4.5 7h15M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13"/>',
+  save: '<path d="M6.5 3.5h11v17l-5.5-4-5.5 4z"/>',
+  clock: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+  help: '<circle cx="12" cy="12" r="8.5"/><path d="M9.6 9.5a2.5 2.5 0 0 1 4.8 1c0 1.7-2.4 2-2.4 3.5M12 17.2v.1"/>',
+  wallet: '<rect x="3.5" y="6" width="17" height="13" rx="3"/><path d="M3.5 10h17M16 14.5h1.5"/>',
+  warning: '<path d="M12 4 2.8 19.5h18.4z"/><path d="M12 10v4.5M12 17v.1"/>',
+  logout: '<path d="M14.5 4.5H18A1.5 1.5 0 0 1 19.5 6v12a1.5 1.5 0 0 1-1.5 1.5h-3.5"/><path d="M10 8l-4 4 4 4M6 12h9"/>',
+  shower: '<path d="M5 12.5a7 7 0 0 1 14 0z"/><path d="M12 5.5V3.5M8 16.5v1M12 16.5v1.5M16 16.5v1M10 20.5v.5M14 20.5v.5"/>',
+  pickup: '<path d="M3.5 7.5 12 3.5l8.5 4v9L12 20.5l-8.5-4z"/><path d="M3.5 7.5 12 11.5l8.5-4M12 11.5v9"/>',
+  pin: '<path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/>',
+  luggage: '<rect x="5" y="7.5" width="14" height="12" rx="2.5"/><path d="M9 7.5V5a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 15 5v2.5M9 11v5M15 11v5"/>',
+  link: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
+  globe: '<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.5 2.6 3.5 5.3 3.5 8.5s-1 5.9-3.5 8.5c-2.5-2.6-3.5-5.3-3.5-8.5s1-5.9 3.5-8.5z"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/>',
+  box: '<path d="M4.5 8.5h15v11h-15z"/><path d="M3.5 4.5h17v4h-17zM10 12h4"/>',
+};
+const ico = (k, cls = '') => `<svg class="i ${cls}" viewBox="0 0 24 24">${P[k]}</svg>`;
+const esc = (s) => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
+const pad = (n) => String(n).padStart(2, '0');
+const mmss = (s) => `${pad(Math.floor(s / 60))}:${pad(s % 60)}`;
+const SEAL = `<svg class="seal-wm" viewBox="0 0 200 200" aria-hidden="true">
+  <defs><path id="arcT" d="M26 100a74 74 0 0 1 148 0"/><path id="arcB" d="M18 100a82 82 0 0 0 164 0"/></defs>
+  <circle cx="100" cy="100" r="97" fill="none" stroke="currentColor" stroke-width="4"/>
+  <circle cx="100" cy="100" r="58" fill="none" stroke="currentColor" stroke-width="2.5"/>
+  <text fill="currentColor" font-size="22" font-weight="700" letter-spacing="6"><textPath href="#arcT" startOffset="50%" text-anchor="middle">齐鲁理工学院</textPath></text>
+  <text fill="currentColor" font-size="13" font-weight="700" letter-spacing="1.5"><textPath href="#arcB" startOffset="50%" text-anchor="middle" dominant-baseline="hanging">QILU INSTITUTE OF TECHNOLOGY</textPath></text>
+</svg>`;
+
+/* ---------------- shared phone helpers ---------------- */
+function page({ title, sub = '', actions = '', body, dock = '', back = true, short = false }) {
+  return `<div class="screen${short ? ' short' : ''}">
+    <div class="pbar">
+      <div>${back ? `<button class="ic" data-act="back" aria-label="返回">${ico('back')}</button>` : ''}</div>
+      <b class="mini">${title}</b>
+      <div class="acts">${actions}</div>
+    </div>
+    <h1 class="ptitle">${title}</h1>${sub ? `<p class="psub">${sub}</p>` : ''}
+    <div class="body">${body}</div>
+  </div>${dock ? `<div class="dock">${dock}</div>` : ''}`;
+}
+function openSheet(ph, html) {
+  ph.querySelector('.sheet').innerHTML = `<div class="grab"></div>${html}`;
+  ph.querySelector('.sheet').scrollTop = 0;
+  ph.classList.add('sheet-open');
+}
+const closeSheet = (ph) => ph.classList.remove('sheet-open');
+// Delayed demo steps are tied to the phone so switching state cancels them.
+function later(ph, fn, ms) { const set = ph._timers ??= new Set(); const id = setTimeout(() => { set.delete(id); fn(); }, ms); set.add(id); return id; }
+function cancelLater(ph) { ph._timers?.forEach(clearTimeout); ph._timers?.clear(); }
+function toast(ph, msg) {
+  const t = ph.querySelector('.toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._tm); t._tm = setTimeout(() => t.classList.remove('show'), 1700);
+}
+function bindScroll(ph) {
+  const sc = ph.querySelector('.screen');
+  if (sc) sc.addEventListener('scroll', () => sc.classList.toggle('scrolled', sc.scrollTop > 36), { passive: true });
+}
+const STATUS = `<div class="status"><span class="num">10:42</span><span class="bars"><i style="width:3px;height:6px"></i><i style="width:3px;height:9px;margin-left:-4px"></i><i style="width:3px;height:12px;margin-left:-4px"></i><i style="width:24px;height:12px;border-radius:4px;opacity:.9"></i></span></div>`;
+
+const TOOLS = {};
+
+/* =========================================================
+   淘宝取件
+   ========================================================= */
+const PKGS = [
+  { code: '3-1-2046', carrier: '中通快递', station: '菜鸟驿站 · 3 号楼店', title: '静音无线鼠标 黑色', no: '7731 0000 4521 08' },
+  { code: 'B08-1173', carrier: '圆通速递', station: '菜鸟驿站 · 3 号楼店', title: 'A4 复印纸 70g 500 张', no: 'YT00 1234 5678 900' },
+];
+function barcode(str) {
+  let x = 0, bars = '', seed = 11;
+  const s = str.replace(/\s/g, '');
+  for (let n = 0; n < s.length; n++) {
+    seed = (seed * 37 + s.charCodeAt(n) * 13) % 9973;
+    for (let k = 0; k < 3; k++) {
+      const w = 1 + ((seed >> k) % 3), gap = 1 + ((seed >> (k + 3)) % 2);
+      bars += `<rect x="${x}" y="0" width="${w}" height="60"/>`; x += w + gap;
+    }
+  }
+  bars = `<rect x="0" width="2" height="60"/><rect x="3" width="1" height="60"/>` + bars.replace(/x="(\d+)"/g, (m, v) => `x="${+v + 6}"`);
+  return `<svg class="bc" viewBox="0 0 ${x + 12} 60" preserveAspectRatio="none" role="img" aria-label="身份码条形码">${bars}<rect x="${x + 7}" width="2" height="60"/><rect x="${x + 10}" width="1" height="60"/></svg>`;
+}
+TOOLS.pickup = {
+  title: '淘宝取件', h: 50, icon: 'pickup',
+  states: [['list', '有包裹'], ['empty', '没有包裹'], ['loading', '首次加载'], ['login', '需要登录'], ['challenge', '人机校验']],
+  st: { mode: 'list', boost: true },
+  stateName() { return this.st.mode; },
+  setState(m) { this.st.mode = m; },
+  render(ph) {
+    const s = this.st;
+    const acts = `<button class="ic" data-act="refresh" aria-label="刷新">${ico('refresh')}</button>`;
+    let body = '';
+    if (s.mode === 'loading') {
+      body = `<section class="card"><div class="sk" style="width:64px;height:14px"></div><div class="sk" style="width:92px;height:52px;margin-top:12px;border-radius:12px"></div><div class="sk" style="width:180px;height:14px;margin-top:12px"></div><div class="sk" style="height:50px;margin-top:18px;border-radius:16px"></div></section>
+        <div class="pkgs">${[0, 1].map(() => `<div class="pkg"><div class="sk" style="width:140px;height:14px"></div><div class="sk" style="width:180px;height:36px;margin-top:12px;border-radius:10px"></div><div class="sk" style="width:220px;height:13px;margin-top:12px"></div></div>`).join('')}</div>`;
+    } else if (s.mode === 'login' || s.mode === 'challenge') {
+      const login = s.mode === 'login';
+      body = `<section class="card gate">
+          <span class="ticon" style="--h:50">${ico(login ? 'lock' : 'warning')}</span>
+          <h2>${login ? '需要登录淘宝' : '需要完成一次人机校验'}</h2>
+          <p>${login ? '登录一次就会一直保持，之后打开这里就能直接看到驿站里的包裹。' : '淘宝要求先拖一下滑块确认是本人，完成后会自动回到列表。'}</p>
+          <button class="btn ink" data-act="web">${login ? '登录淘宝' : '去验证'}</button>
+        </section>
+        <p class="foot">只读取驿站取件信息和身份码，不会下单或修改你的淘宝账号。</p>`;
+    } else {
+      const n = s.mode === 'list' ? PKGS.length : 0;
+      body = `<section class="card sum">
+          <div class="sum-top"><span class="lbl">待取件</span><span class="meta">更新于 <span class="num">10:42</span></span></div>
+          <div class="big"><span class="num${n ? ' seal-t' : ''}">${n}</span><small>件</small></div>
+          <p class="where">${n ? '菜鸟驿站 · 3 号楼店' : '已登录淘宝取件，暂时没有到站的包裹'}</p>
+          <button class="btn ink" data-act="idcode">${ico('barcode')}出示身份码</button>
+        </section>
+        ${n ? `<div class="sec">待取包裹<span>点取件码复制</span></div>
+        <div class="pkgs">${PKGS.map(p => `<button class="pkg" data-act="copy" data-code="${p.code}">
+            <div class="pkg-top"><span class="chip" style="--h:50">${p.carrier}</span>${p.station}</div>
+            <div class="pkg-code"><span class="num">${p.code}</span>${ico('copy')}</div>
+            <p class="pkg-title">${esc(p.title)}</p>
+            <p class="pkg-no">单号 <span class="num">${p.no}</span></p>
+          </button>`).join('')}</div>`
+        : `<div class="empty">${ico('box')}<br>包裹到站后会出现在这里<br>今天页的"取件"也会显示红点</div>`}`;
+    }
+    ph.querySelector('.view').innerHTML = page({ title: '淘宝取件', actions: acts, body });
+  },
+  idSheet() {
+    const s = this.st;
+    return `<div class="sh-head"><h2>身份码</h2><span class="chip" style="--h:150">${ico('check')}已认证</span></div>
+      <p class="sh-sub">给驿站工作人员扫这个码，就能取走名下所有包裹。</p>
+      <div class="idcard">${barcode('880000123456')}<div class="num idnum">8800 0012 3456</div></div>
+      <dl class="kv"><dt>手机号</dt><dd class="num">138****0000</dd><dt>账号</dt><dd>tb_qlit_demo</dd><dt>更新于</dt><dd class="num">10:42:08</dd></dl>
+      <div class="list"><label class="row"><span class="tx"><b>扫码时调高亮度</b><span>打开身份码时临时调到最亮</span></span><input type="checkbox" class="switch" data-act="boost" ${s.boost ? 'checked' : ''}></label></div>
+      <div class="actions"><button class="btn tonal" data-act="close-sheet">关闭</button><button class="btn ink" data-act="id-refresh">${ico('refresh')}刷新</button></div>`;
+  },
+  act(a, el, ph) {
+    const s = this.st;
+    if (a === 'copy') toast(ph, `取件码 ${el.dataset.code} 已复制`);
+    else if (a === 'idcode') openSheet(ph, this.idSheet());
+    else if (a === 'boost') { s.boost = el.checked; }
+    else if (a === 'id-refresh') { el.innerHTML = '<span class="spin"></span>刷新中'; el.disabled = true; later(ph, () => { closeSheet(ph); later(ph, () => { openSheet(ph, this.idSheet()); toast(ph, '身份码已更新'); }, 380); }, 700); }
+    else if (a === 'refresh') { const prev = s.mode; if (prev === 'login' || prev === 'challenge') return toast(ph, '请先完成登录'); s.mode = 'loading'; this.render(ph); later(ph, () => { s.mode = prev; this.render(ph); toast(ph, '已更新'); }, 900); }
+    else if (a === 'web') {
+      const login = s.mode === 'login';
+      openSheet(ph, `<div class="sh-head"><h2>${login ? '登录淘宝' : '人机校验'}</h2><button class="ic" data-act="close-sheet" aria-label="收起">${ico('close')}</button></div>
+        <p class="sh-sub">${login ? '在下面的淘宝页面里登录。' : '在下面完成滑块验证。'}完成后这里会自动收起，并刷新包裹。</p>
+        <div class="web"><div class="url">${ico('lock')}main.m.taobao.com</div><div class="loadbar"></div>
+          <div class="pg"><div class="sk" style="width:110px;height:30px;margin:0 auto 8px;border-radius:10px"></div><div class="sk" style="height:46px;border-radius:12px"></div><div class="sk" style="height:46px;border-radius:12px"></div><div class="sk" style="height:46px;border-radius:999px;opacity:.7"></div>
+          <button class="btn tonal sm" style="margin:8px auto 0" data-act="web-ok">（演示）模拟${login ? '登录' : '验证'}成功</button></div></div>`);
+    }
+    else if (a === 'web-ok') { closeSheet(ph); s.mode = 'loading'; this.render(ph); syncSeg('pickup'); later(ph, () => { s.mode = 'list'; this.render(ph); syncSeg('pickup'); toast(ph, '已登录，包裹已同步'); }, 1000); }
+    else if (a === 'back') toast(ph, '返回工具页');
+  },
+};
+
+/* =========================================================
+   浴室预约
+   ========================================================= */
+const AREAS = [
+  { id: 1, name: '3号楼1层 男浴', idle: 4, total: 26 },
+  { id: 2, name: '3号楼2层 女浴', idle: 11, total: 24 },
+  { id: 3, name: '7号楼1层 男浴', idle: 0, total: 18, queue: 3 },
+  { id: 4, name: '7号楼2层 女浴', idle: 0, total: 18, maint: '热水管道检修，预计 14:00 恢复' },
+];
+const FREE = [3, 8, 12, 21], RESV = [5, 16];
+TOOLS.bath = {
+  title: '浴室预约', h: 220, icon: 'shower',
+  states: [['login', '登录'], ['areas', '浴室列表'], ['devices', '选喷头'], ['full', '满了去排队'], ['ticket', '已预约'], ['queue', '排队中']],
+  st: { view: 'areas', area: 1, ticket: null, pw: false, tab: 'pwd', code: 0, lowBal: false },
+  stateName() { const s = this.st; return s.view === 'devices' && s.area === 3 ? 'full' : s.view; },
+  setState(m) {
+    const s = this.st;
+    if (m === 'full') { s.view = 'devices'; s.area = 3; }
+    else if (m === 'devices') { s.view = 'devices'; s.area = 1; }
+    else if (m === 'ticket') { s.view = 'ticket'; if (!s.ticket) s.ticket = { n: 12, until: Date.now() + 581000, total: 600 }; }
+    else { s.view = m; if (m === 'login') s.ticket = null; }
+  },
+  render(ph) {
+    const s = this.st, v = ph.querySelector('.view');
+    if (s.ticket && s.ticket.until <= Date.now() - 60000) s.ticket = null;
+    if (s.view === 'login') {
+      const pwd = s.tab === 'pwd';
+      v.innerHTML = page({ title: '浴室预约', sub: '用大白U帮 App 的账号登录', short: true, body: `
+        <div class="tabs2" role="group"><button data-act="tab" data-v="pwd" aria-pressed="${pwd}">密码登录</button><button data-act="tab" data-v="sms" aria-pressed="${!pwd}">验证码登录</button></div>
+        <div class="group"><div class="list">
+          <label class="inp"><span>手机号</span><input class="num" inputmode="numeric" value="138 0000 0000"></label>
+          ${pwd ? `<label class="inp"><span>密码</span><input type="${s.pw ? 'text' : 'password'}" value="demo1234"><button class="ic" data-act="pw" aria-label="显示密码">${ico(s.pw ? 'eyeOff' : 'eye')}</button></label>`
+                : `<label class="inp"><span>验证码</span><input class="num" inputmode="numeric" placeholder="6 位数字"><button class="codebtn" data-act="sms" ${s.code ? 'disabled' : ''}>${s.code ? `<span class="num">${s.code}</span>s 后重发` : '获取验证码'}</button></label>`}
+        </div></div>
+        <div style="margin:4px 16px 0"><button class="btn ink" data-act="login">登录</button></div>
+        <p class="foot" style="margin-top:0">账号、密码只用来调用大白U帮的官方接口，保存在本机。</p>` });
+    } else if (s.view === 'areas') {
+      const acts = `<button class="ic" data-act="refresh" aria-label="刷新">${ico('refresh')}</button><button class="ic" data-act="more" aria-label="更多">${ico('more')}</button>`;
+      const left = s.ticket ? Math.max(0, Math.round((s.ticket.until - Date.now()) / 1000)) : 0;
+      v.innerHTML = page({ title: '浴室预约', actions: acts, body: `
+        ${s.ticket ? `<button class="live" data-act="go-ticket"><i class="pulse"></i>已预约 <span class="num">${s.ticket.n}</span> 号喷头 · <span class="num" data-cd>${mmss(left)}</span> 内到达${ico('chevR')}</button>` : ''}
+        <button class="card bal" data-act="wallet"><div>
+          <div class="sum-top"><span class="lbl">浴室余额</span>${s.lowBal ? '<span class="chip seal">余额不足</span>' : ''}</div>
+          <div class="big"><small>¥</small><span class="num${s.lowBal ? ' seal-t' : ''}">${s.lowBal ? '1.20' : '12.34'}</span></div>
+          <p class="where">${s.lowBal ? '洗一次约 ¥2.00，请先在大白U帮充值' : '可用 <span class="num">10.00</span> · 赠送 <span class="num">2.34</span> · 点击看流水'}</p>
+        </div>${ico('chevR')}</button>
+        <div class="group"><h3>浴室<span>更新于 <span class="num">10:42</span></span></h3><div class="list">
+          ${AREAS.map(a => {
+            const occ = Math.round((1 - a.idle / a.total) * 100);
+            const right = a.maint ? '<span class="chip ink">维护中</span>'
+              : `<span class="idle${a.idle ? '' : ' zero'}"><b>${a.idle}</b><small>${a.idle ? '空位' : `${a.queue} 人排队`}</small></span>`;
+            return `<button class="row inset area${a.maint ? ' dim' : ''}" data-act="area" data-id="${a.id}">
+              <span class="ticon" style="--h:220">${ico('shower')}</span>
+              <span class="tx"><b>${a.name}</b>${a.maint ? `<span>${a.maint}</span>` : `<span>共 <span class="num">${a.total}</span> 个喷头 · 占用 <span class="num">${occ}</span>%</span><span class="occ"><i style="width:${occ}%"></i></span>`}</span>${right}</button>`;
+          }).join('')}
+        </div></div>` });
+    } else if (s.view === 'devices') {
+      const a = AREAS.find(x => x.id === s.area);
+      const full = a.idle === 0;
+      const plan = !full ? (() => {
+        const cell = (n) => {
+          const mine = s.ticket && s.ticket.n === n;
+          const cls = mine ? 'mine' : FREE.includes(n) ? 'free' : '';
+          return `<button class="cell ${cls}" ${cls === 'free' ? `data-act="book" data-n="${n}"` : 'tabindex="-1"'} aria-label="${n} 号">${n}</button>`;
+        };
+        const r = (arr) => `<div class="prow">${arr.map(n => n === 0 ? '<span class="cell locker">储物</span>' : cell(n)).join('')}</div>`;
+        return `<section class="card plan"><div class="plan-h"><b>浴位示意</b><span class="legend"><span><i style="background:oklch(var(--cb-l) var(--cb-c) 220);box-shadow:inset 0 0 0 1.5px oklch(.64 .1 220 / .5)"></i>空闲</span><span><i style="background:var(--surface-2)"></i>占用</span><span><i style="background:var(--seal)"></i>我的</span></span></div>
+          <div class="zone"><p class="zone-name">外区</p>${r([0, 1, 2, 3, 4, 5, 6])}<div class="aisle">通道</div>${r([0, 12, 11, 10, 9, 8, 7])}</div>
+          <div class="zone"><p class="zone-name">内区</p>${r([13, 14, 15, 16, 17, 18, 19])}<div class="aisle">通道</div>${r([26, 25, 24, 23, 22, 21, 20])}</div>
+          <p class="foot" style="margin:12px 2px 0">点空闲的格子直接预约</p></section>`;
+      })() : '';
+      const freeRows = FREE.map(n => {
+        const mine = s.ticket && s.ticket.n === n;
+        return `<div class="row inset"><span class="dnum">${n}</span><span class="tx"><b>${n} 号喷头</b><span>${mine ? '我的预约' : '空闲，可预约'}</span></span>${mine ? '<button class="btn sm tonal" data-act="go-ticket">查看</button>' : `<button class="btn sm ink" data-act="book" data-n="${n}">预约</button>`}</div>`;
+      }).join('');
+      v.innerHTML = page({ title: a.name, sub: full ? '暂时没有空位，可以先排队' : '预约后请在 10 分钟内到达', actions: `<button class="ic" data-act="refresh" aria-label="刷新">${ico('refresh')}</button>`, body: `
+        <section class="card"><div class="stats3">
+          <div><span class="num">${full ? 0 : FREE.length}</span><small>空闲</small></div><div><span class="num">${full ? 2 : RESV.length}</span><small>已预约</small></div><div><span class="num">${full ? 16 : 20}</span><small>使用中</small></div>
+        </div></section>
+        ${plan}
+        ${full ? `<div class="notice">${ico('clock')}<div><b>前面有 <span class="num">3</span> 人在排队</b><br>排上后按顺序分配喷头，轮到你时会发通知。</div></div>` :
+        `<div class="group"><h3>可预约<span>更新于 <span class="num">10:42</span></span></h3><div class="list">${freeRows}</div></div>
+         <div class="group"><h3>其他</h3><div class="list">
+           ${RESV.map(n => `<div class="row inset dim"><span class="dnum">${n}</span><span class="tx"><b>${n} 号喷头</b><span>已被别人预约</span></span></div>`).join('')}
+           <div class="row inset dim"><span class="dnum">1</span><span class="tx"><b>其余 20 个喷头</b><span>使用中</span></span></div>
+         </div></div>`}`,
+        dock: full ? `<button class="btn ink" data-act="queue">${ico('clock')}去排队 · <span class="num">3</span> 人在排</button>` : '' });
+    } else if (s.view === 'ticket') {
+      const t = s.ticket, left = Math.max(0, Math.round((t.until - Date.now()) / 1000));
+      v.innerHTML = page({ title: '已预约', body: `
+        <article class="ticket${left ? '' : ' expired'}" data-ticket>${SEAL}
+          <div class="top"><span data-tk-st>${left ? '待服务' : '预约已过期'}</span><span>3号楼1层 男浴</span></div>
+          <div class="tk-dev"><span class="num">${t.n}</span><small>号喷头</small></div>
+          <div class="tk-count"><span class="num" data-cd>${mmss(left)}</span><small data-tk-tip>${left ? '内到达，逾期自动取消' : '请重新预约'}</small></div>
+          <div class="tk-track"><i data-tk-bar style="width:${left / t.total * 100}%"></i></div>
+        </article>
+        <div class="group"><h3>到了之后</h3><div class="list">
+          <div class="row"><span class="tx"><b>短账号</b></span><span class="val"><span class="num">B7046</span></span><button class="ic" data-act="copy-acc" aria-label="复制">${ico('copy')}</button></div>
+          <div class="row"><span class="tx"><b>设备密码</b></span><span class="val"><span class="num">${s.pw ? '6408' : '••••'}</span></span><button class="ic" data-act="pw" aria-label="显示">${ico(s.pw ? 'eyeOff' : 'eye')}</button></div>
+        </div></div>
+        <p class="foot">返回列表也不会丢，顶部会一直显示这次预约。</p>`,
+        dock: `<div class="btnrow"><button class="btn tonal" data-act="cancel">取消预约</button><button class="btn ink" data-act="start">开始服务</button></div>` });
+    } else if (s.view === 'queue') {
+      v.innerHTML = page({ title: '排队中', body: `
+        <section class="card">
+          <div class="sum-top"><span class="lbl"><i class="pulse"></i>排队中</span><span class="meta">每 5 秒刷新</span></div>
+          <div class="big"><small>前面还有</small><span class="num">3</span><small>人</small></div>
+          <div class="qstats"><div><span class="num">18</span><small>排队号</small></div><div><span class="num">12</span><small>预计等待（分钟）</small></div></div>
+        </section>
+        <div class="group"><div class="list"><div class="row inset"><span class="ticon" style="--h:220">${ico('shower')}</span><span class="tx"><b>7号楼1层 男浴</b><span>到号后会发通知</span></span></div></div></div>
+        <p class="foot">到号后请尽快前往浴室，过号会自动取消。</p>`,
+        dock: `<button class="btn tonal" data-act="unqueue">取消排队</button>` });
+    }
+    bindScroll(ph);
+  },
+  tick(ph) {
+    const s = this.st; if (!s.ticket) return;
+    const left = Math.max(0, Math.round((s.ticket.until - Date.now()) / 1000));
+    ph.querySelectorAll('[data-cd]').forEach(e => e.textContent = mmss(left));
+    const bar = ph.querySelector('[data-tk-bar]'); if (bar) bar.style.width = `${left / s.ticket.total * 100}%`;
+    if (!left && ph.querySelector('[data-ticket]:not(.expired)')) this.render(ph);
+  },
+  act(a, el, ph) {
+    const s = this.st;
+    if (a === 'tab') { s.tab = el.dataset.v; this.render(ph); }
+    else if (a === 'pw') { s.pw = !s.pw; this.render(ph); }
+    else if (a === 'sms') { s.code = 60; this.render(ph); toast(ph, '验证码已发送'); const it = setInterval(() => { s.code--; if (s.view === 'login' && s.tab === 'sms') { const b = ph.querySelector('.codebtn'); if (b) b.innerHTML = s.code ? `<span class="num">${s.code}</span>s 后重发` : '获取验证码'; if (b && !s.code) b.disabled = false; } if (!s.code) clearInterval(it); }, 1000); }
+    else if (a === 'login') { el.innerHTML = '<span class="spin"></span>'; later(ph, () => { s.view = 'areas'; this.render(ph); syncSeg('bath'); }, 600); }
+    else if (a === 'area') { const ar = AREAS.find(x => x.id === +el.dataset.id); if (ar.maint) return toast(ph, '这个浴室在维护'); s.area = ar.id; s.view = 'devices'; this.render(ph); syncSeg('bath'); }
+    else if (a === 'back') {
+      if (s.view === 'devices') { s.view = 'areas'; this.render(ph); }
+      else if (s.view === 'ticket') { s.view = 'areas'; this.render(ph); }
+      else if (s.view === 'queue') return toast(ph, '排队中只能先取消排队');
+      else return toast(ph, '返回工具页');
+      syncSeg('bath');
+    }
+    else if (a === 'book') {
+      const n = +el.dataset.n;
+      if (s.ticket) return toast(ph, '你已经有一个预约了');
+      openSheet(ph, `<h2>预约 ${n} 号喷头</h2><p class="sh-sub">通过大白U帮官方接口预约，成功后需在 10 分钟内到达。</p>
+        <dl class="kv"><dt>浴室</dt><dd>3号楼1层 男浴</dd><dt>服务方</dt><dd>大白U帮</dd><dt>可用时段</dt><dd><span class="chip ink num">06:30 – 13:00</span> <span class="chip ink num">15:00 – 23:30</span></dd></dl>
+        <div class="actions"><button class="btn tonal" data-act="close-sheet">取消</button><button class="btn ink" data-act="book-ok" data-n="${n}">确认预约</button></div>`);
+    }
+    else if (a === 'book-ok') { el.innerHTML = '<span class="spin"></span>'; el.disabled = true; later(ph, () => { closeSheet(ph); s.ticket = { n: +el.dataset.n, until: Date.now() + 600000, total: 600 }; s.view = 'ticket'; this.render(ph); syncSeg('bath'); }, 650); }
+    else if (a === 'go-ticket') { s.view = 'ticket'; this.render(ph); syncSeg('bath'); }
+    else if (a === 'cancel') openSheet(ph, `<h2>取消这次预约？</h2><p class="sh-sub">${s.ticket.n} 号喷头会立即释放给其他人。</p><div class="actions"><button class="btn tonal" data-act="close-sheet">再想想</button><button class="btn seal" data-act="cancel-ok">取消预约</button></div>`);
+    else if (a === 'cancel-ok') { closeSheet(ph); s.ticket = null; s.view = 'areas'; this.render(ph); syncSeg('bath'); toast(ph, '已取消预约'); }
+    else if (a === 'start') toast(ph, '开始服务暂未接入');
+    else if (a === 'copy-acc') toast(ph, '短账号已复制');
+    else if (a === 'queue') { el.innerHTML = '<span class="spin"></span>'; later(ph, () => { s.view = 'queue'; this.render(ph); syncSeg('bath'); }, 600); }
+    else if (a === 'unqueue') { s.view = 'devices'; this.render(ph); syncSeg('bath'); toast(ph, '已取消排队'); }
+    else if (a === 'wallet') toast(ph, '进入余额流水（已重做）');
+    else if (a === 'refresh') toast(ph, '已更新');
+    else if (a === 'more') openSheet(ph, `<h2>浴室账号</h2><p class="sh-sub">138****0000</p><div class="list">
+        <button class="row inset" data-act="wallet"><span class="ticon" style="--h:125">${ico('wallet')}</span><span class="tx"><b>余额流水</b></span>${ico('chevR', 'chev')}</button>
+        <button class="row inset" data-act="lowbal"><span class="ticon" style="--h:60">${ico('warning')}</span><span class="tx"><b>（演示）切换余额不足</b></span></button>
+        <button class="row inset" data-act="logout"><span class="ticon" style="--h:25">${ico('logout')}</span><span class="tx"><b class="danger">退出登录</b></span></button></div>`);
+    else if (a === 'lowbal') { s.lowBal = !s.lowBal; closeSheet(ph); this.render(ph); }
+    else if (a === 'logout') { closeSheet(ph); s.view = 'login'; s.ticket = null; this.render(ph); syncSeg('bath'); }
+  },
+};
+
+/* =========================================================
+   模拟定位
+   ========================================================= */
+const TRACK = { cx: 195, cy: 300, L: 78 };
+const laneR = (k) => 58 + (k - 0.5) * 9.5;
+const lanePath = (k) => { const { cx, cy, L } = TRACK, r = laneR(k); return `M${cx + r},${cy + L} V${cy - L} A${r},${r} 0 0 0 ${cx - r},${cy - L} V${cy + L} A${r},${r} 0 0 0 ${cx + r},${cy + L} Z`; };
+const laneMeters = (k) => Math.round(390 + (k - 1) * 7.7);
+const stad = (r) => { const { cx, cy, L } = TRACK; return `M${cx + r},${cy + L} V${cy - L} A${r},${r} 0 0 0 ${cx - r},${cy - L} V${cy + L} A${r},${r} 0 0 0 ${cx + r},${cy + L} Z`; };
+function mapSVG(layer) {
+  const sat = layer === 'sat';
+  const c = sat ? { bg: '#3a4334', road: '#6f716a', bld: ['#5d605a', '#4e524b', '#6a6c66'], tree: '#2c3827', track: '#8a5847', field: '#3f6b3a', line: 'rgba(255,255,255,.45)' }
+                : { bg: '#EEEAE2', road: '#FFFFFF', bld: ['#E0DBD1', '#DCD6CB', '#E4DFD6'], tree: '#D5E1CB', track: '#E6CFC3', field: '#D3E2CA', line: 'rgba(255,255,255,.9)' };
+  const blds = [[18, 86, 96, 58], [290, 96, 84, 120], [16, 486, 118, 70], [262, 520, 112, 64], [150, 610, 96, 74], [18, 640, 86, 130], [286, 640, 90, 112], [150, 720, 96, 90]];
+  const trees = [[140, 70], [168, 92], [252, 70], [30, 200], [52, 236], [356, 270], [338, 300], [40, 420], [366, 452], [216, 590], [126, 580]];
+  return `<svg viewBox="0 0 390 844" preserveAspectRatio="xMidYMid slice" aria-label="地图">
+    <rect width="390" height="844" fill="${c.bg}"/>
+    ${sat ? Array.from({ length: 40 }, (_, i) => `<rect x="${(i * 97) % 390}" y="${(i * 53) % 844}" width="${18 + (i % 5) * 7}" height="${12 + (i % 4) * 6}" fill="${i % 2 ? '#434c3c' : '#353d30'}" opacity=".7"/>`).join('') : ''}
+    <path d="M0 462H390M0 104H390M42 0V844M360 0V844M195 462V844" stroke="${sat ? '#555750' : '#DCD5C9'}" stroke-width="${sat ? 16 : 20}"/>
+    <path d="M0 462H390M0 104H390M42 0V844M360 0V844M195 462V844" stroke="${c.road}" stroke-width="${sat ? 12 : 16}"/>
+    ${blds.map(([x, y, w, h], i) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${sat ? 2 : 6}" fill="${c.bld[i % 3]}"/>`).join('')}
+    ${trees.map(([x, y], i) => `<circle cx="${x}" cy="${y}" r="${9 + (i % 3) * 3}" fill="${c.tree}"/>`).join('')}
+    <path d="${stad(116)}" fill="${c.track}"/>
+    <path d="${stad(57)}" fill="${c.field}"/>
+    ${[0, 1, 2, 3, 4, 5, 6].map(k => `<path d="${stad(57.5 + k * 9.5)}" fill="none" stroke="${c.line}" stroke-width=".8"/>`).join('')}
+    <path d="M${TRACK.cx - 57},${TRACK.cy} H${TRACK.cx + 57}" stroke="${c.line}" stroke-width="1"/>
+    <circle cx="${TRACK.cx}" cy="${TRACK.cy}" r="16" fill="none" stroke="${c.line}" stroke-width="1"/>
+    <g id="rt"></g>
+  </svg>`;
+}
+TOOLS.mock = {
+  title: '模拟定位', h: 150, icon: 'pin',
+  states: [['idle', '还没路线'], ['route', '已选路线'], ['params', '调参数'], ['draw', '自己画'], ['run', '模拟中'], ['gate', '没权限']],
+  st: { mode: 'route', open: false, layer: 'sat', lane: 1, loops: 2, speed: 2.5, jitter: 1, pts: [], saved: 1, gate: false, t: 0 },
+  stateName() { const s = this.st; if (s.gate) return 'gate'; if (s.mode === 'route' && s.open) return 'params'; return s.mode; },
+  setState(m) {
+    const s = this.st; s.gate = false; s.open = false;
+    if (m === 'params') { s.mode = 'route'; s.open = true; }
+    else if (m === 'gate') { s.mode = 'route'; s.gate = true; s.open = true; }
+    else if (m === 'draw') { s.mode = 'draw'; s.pts = [[96, 140], [150, 150], [176, 196], [230, 206], [290, 250]]; }
+    else if (m === 'run') { s.mode = 'run'; s.t = 0.22; }
+    else s.mode = m;
+  },
+  dist() { const s = this.st; if (s.mode === 'draw') { let d = 0; for (let i = 1; i < s.pts.length; i++) d += Math.hypot(s.pts[i][0] - s.pts[i - 1][0], s.pts[i][1] - s.pts[i - 1][1]); return Math.round(d * 1.05); } return laneMeters(s.lane); },
+  pace() { const sec = 1000 / this.st.speed; return `${Math.floor(sec / 60)}'${pad(Math.round(sec % 60))}"`; },
+  render(ph) {
+    const s = this.st, v = ph.querySelector('.view');
+    ph.classList.add('on-map'); ph.classList.toggle('road', s.layer === 'road');
+    const hasRoute = s.mode === 'route' || s.mode === 'run' || (s.mode === 'draw' && s.pts.length > 1);
+    const name = s.mode === 'draw' ? '自己画的路线' : `田径场 ${s.lane} 道`;
+    const d = this.dist(), total = d * s.loops, mins = Math.max(1, Math.round(total / s.speed / 60));
+    let summary;
+    if (s.mode === 'run') {
+      const done = total * s.t, lap = Math.min(s.loops, Math.floor(s.t * s.loops) + 1), el = Math.round(done / s.speed), left = Math.round((total - done) / s.speed);
+      summary = `<div class="psum"><div class="runsum">
+          <div class="livel"><i class="pulse"></i>正在模拟 · 第 <span class="num" data-r-lap>${lap}/${s.loops}</span> 圈</div>
+          <div class="big"><span class="num" data-r-d>${(done / 1000).toFixed(2)}</span><small>/ ${(total / 1000).toFixed(2)} km</small></div>
+        </div><button class="play stop" data-act="stop" aria-label="停止">${ico('stop')}</button></div>
+        <div class="rbar"><i data-r-bar style="width:${s.t * 100}%"></i></div>
+        <div class="runstats"><div><span class="num" data-r-el>${mmss(el)}</span><small>已用时</small></div><div><span class="num">${this.pace()}</span><small>配速 /km</small></div><div><span class="num" data-r-left>${mmss(left)}</span><small>还剩</small></div></div>`;
+    } else {
+      summary = `${s.gate ? `<div class="notice">${ico('warning')}<div><b>还没把 QLIT 设为模拟位置应用</b><br>开发者选项 → 选择模拟位置信息应用 → QLIT 小助手<button class="btn sm ink" data-act="devopt">打开开发者选项</button></div></div>` : ''}
+        <div class="psum"><div class="tx">
+          <b>${hasRoute ? name : '先放几个路线点'}</b>
+          <span>${hasRoute ? `<span class="num">${d}</span> m · <span class="num">${s.loops}</span> 圈 · 约 <span class="num">${mins}</span> 分钟` : s.mode === 'draw' ? '再点一个点就能开始' : '轻点地图，或选下面的田径场道次'}</span>
+        </div><button class="play" data-act="start" aria-label="开始" ${hasRoute && !s.gate ? '' : 'disabled'}>${ico('play')}</button></div>
+        ${s.mode === 'draw' ? `<div class="edit3"><button class="btn tonal" data-act="undo">${ico('undo')}撤销</button><button class="btn tonal" data-act="clear">${ico('trash')}清空</button><button class="btn tonal" data-act="save" ${s.pts.length > 1 ? '' : 'disabled'}>${ico('save')}保存</button></div>` : ''}
+        <div class="chips" role="group" aria-label="路线">
+          ${[1, 2, 3, 4, 5, 6].map(k => `<button data-act="lane" data-k="${k}" aria-pressed="${s.mode !== 'draw' && s.mode !== 'idle' && s.lane === k}">${k} 道</button>`).join('')}
+          ${s.saved ? `<button data-act="saved" aria-pressed="false">路线 1</button>` : ''}
+          <button data-act="draw" aria-pressed="${s.mode === 'draw'}">${ico('plus')}自己画</button>
+        </div>`;
+    }
+    const more = s.mode === 'run'
+      ? `<div class="group"><div class="list">
+          <div class="row"><span class="tx"><b>当前坐标</b><span class="num" data-r-pos>36.573120, 116.804207</span></span></div>
+          <div class="row"><span class="tx"><b>定位漂移</b></span><span class="val"><span class="num">±${s.jitter}</span> m</span></div>
+          <div class="row"><span class="tx"><b>通知栏</b><span>"路线模拟中"会一直显示，点它回到这里</span></span></div></div></div>`
+      : `<div class="group"><h3>跑法</h3><div class="list">
+          <div class="prm"><div class="prm-h"><b>速度</b><span><span class="num" data-v-speed>${s.speed.toFixed(1)}</span> m/s · 配速 <span class="num" data-v-pace>${this.pace()}</span></span></div><input type="range" min="0.5" max="8" step="0.1" value="${s.speed}" data-in="speed" aria-label="速度"></div>
+          <div class="prm flex"><div class="tx"><b>圈数</b><span>共 <span class="num" data-v-total>${(total / 1000).toFixed(2)}</span> km</span></div><div class="stepper"><button data-act="loops" data-d="-1" aria-label="减一圈">${ico('minus')}</button><span class="num">${s.loops}</span><button data-act="loops" data-d="1" aria-label="加一圈">${ico('plus')}</button></div></div>
+          <div class="prm"><div class="prm-h"><b>定位漂移</b><span data-v-jit>${s.jitter < 0.05 ? '关闭' : `<span class="num">±${s.jitter}</span> m`}</span></div><input type="range" min="0" max="25" step="1" value="${s.jitter}" data-in="jitter" aria-label="定位漂移"></div>
+        </div></div>
+        <div class="group"><h3>我的路线<span>${s.saved ? `<button class="tbtn seal" data-act="clear-saved" style="font-size:13px;padding:0">全部清除</button>` : ''}</span></h3><div class="list">
+          ${s.saved ? `<button class="row" data-act="saved"><span class="tx"><b>路线 1</b><span><span class="num">238</span> m · 5 个点</span></span>${ico('chevR', 'chev')}</button>` : `<div class="row"><span class="tx"><span>点"自己画"，画完点保存</span></span></div>`}
+        </div></div>`;
+    v.innerHTML = `<div class="map" data-map>${mapSVG(s.layer)}</div>
+      <div class="mapbar"><button class="gbtn glass" data-act="back" aria-label="返回">${ico('back')}</button><span class="gtitle glass">模拟定位</span><button class="gbtn glass" data-act="layer" aria-label="${s.layer === 'sat' ? '切换到矢量图' : '切换到卫星图'}">${ico('layers')}</button></div>
+      ${s.mode === 'idle' ? '<div class="maphint glass">轻点地图放置路线点，或在下方选一条路线</div>' : ''}
+      <section class="panel${s.open ? ' open' : ''}">
+        <button class="grabber" data-act="panel" aria-label="${s.open ? '收起' : '展开'}"></button>
+        ${summary}
+        <div class="pmore"><div class="pmore-in">${more}</div></div>
+      </section>`;
+    this.drawRoute(ph);
+  },
+  drawRoute(ph) {
+    const s = this.st, g = ph.querySelector('#rt'); if (!g) return;
+    const sat = s.layer === 'sat', ink = getComputedStyle(document.documentElement).getPropertyValue('--ink').trim() || '#1D1B18';
+    const lineC = sat ? '#fff' : ink, haloC = sat ? 'rgba(0,0,0,.35)' : 'rgba(255,255,255,.7)';
+    let d = '';
+    if (s.mode === 'route' || s.mode === 'run') d = lanePath(s.lane);
+    else if (s.mode === 'draw' && s.pts.length) d = 'M' + s.pts.map(p => p.join(',')).join(' L');
+    if (!d) { g.innerHTML = ''; return; }
+    g.innerHTML = `<path d="${d}" fill="none" stroke="${haloC}" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/><path id="rtp" d="${d}" fill="none" stroke="${lineC}" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><g id="rtd"></g><g id="arrow"></g>`;
+    const path = g.querySelector('#rtp'), len = path.getTotalLength();
+    let dots = '';
+    if (s.mode === 'draw') dots = s.pts.slice(1).map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="4.5" fill="${sat ? '#fff' : ink}" stroke="${sat ? '#1D1B18' : '#fff'}" stroke-width="2"/>`).join('');
+    else for (let i = 1; i < 16; i++) { const q = path.getPointAtLength(len * i / 16); dots += `<circle cx="${q.x}" cy="${q.y}" r="3" fill="${sat ? '#1D1B18' : '#fff'}" stroke="${lineC}" stroke-width="1.6"/>`; }
+    g.querySelector('#rtd').innerHTML = dots;
+    this.placeArrow(ph);
+  },
+  placeArrow(ph) {
+    const s = this.st, path = ph.querySelector('#rtp'), a = ph.querySelector('#arrow'); if (!path || !a) return;
+    const len = path.getTotalLength();
+    const at = s.mode === 'run' ? ((s.t * s.loops) % 1) * len : 0;
+    const p = path.getPointAtLength(at), q = path.getPointAtLength(Math.min(len, at + 2));
+    const deg = Math.atan2(q.y - p.y, q.x - p.x) * 180 / Math.PI + 90;
+    a.setAttribute('transform', `translate(${p.x},${p.y}) rotate(${deg})`);
+    a.innerHTML = `${s.mode === 'run' ? '<circle r="18" fill="rgba(200,22,29,.18)"/>' : ''}<circle r="11" fill="#fff" stroke="#1D1B18" stroke-width="2"/><path d="M0 -6 L5 4 L0 1.5 L-5 4 Z" fill="${s.mode === 'run' ? '#C8161D' : '#1D1B18'}"/>`;
+  },
+  tick(ph) {
+    const s = this.st; if (s.mode !== 'run') return;
+    s.t += 0.0025; if (s.t >= 1) { s.mode = 'route'; s.t = 0; this.render(ph); syncSeg('mock'); return toast(ph, '模拟完成'); }
+    const d = this.dist(), total = d * s.loops, done = total * s.t;
+    const set = (k, val) => { const e = ph.querySelector(`[data-r-${k}]`); if (e) e.textContent = val; };
+    set('d', (done / 1000).toFixed(2)); set('el', mmss(Math.round(done / s.speed))); set('left', mmss(Math.round((total - done) / s.speed)));
+    set('lap', `${Math.min(s.loops, Math.floor(s.t * s.loops) + 1)}/${s.loops}`);
+    set('pos', `${(36.57312 + Math.sin(s.t * 40) * 0.0004).toFixed(6)}, ${(116.804207 + Math.cos(s.t * 40) * 0.0005).toFixed(6)}`);
+    const bar = ph.querySelector('[data-r-bar]'); if (bar) bar.style.width = `${s.t * 100}%`;
+    this.placeArrow(ph);
+  },
+  input(k, el, ph) {
+    const s = this.st;
+    if (k === 'speed') { s.speed = +el.value; ph.querySelector('[data-v-speed]').textContent = s.speed.toFixed(1); ph.querySelector('[data-v-pace]').textContent = this.pace(); }
+    if (k === 'jitter') { s.jitter = +el.value; ph.querySelector('[data-v-jit]').innerHTML = s.jitter < 0.05 ? '关闭' : `<span class="num">±${s.jitter}</span> m`; }
+    const t = ph.querySelector('.psum .tx span'); if (t && s.mode !== 'draw' && s.mode !== 'idle') { const d = this.dist(); t.innerHTML = `<span class="num">${d}</span> m · <span class="num">${s.loops}</span> 圈 · 约 <span class="num">${Math.max(1, Math.round(d * s.loops / s.speed / 60))}</span> 分钟`; }
+  },
+  act(a, el, ph, ev) {
+    const s = this.st;
+    if (a === 'panel') { s.open = !s.open; ph.querySelector('.panel').classList.toggle('open', s.open); syncSeg('mock'); }
+    else if (a === 'layer') { s.layer = s.layer === 'sat' ? 'road' : 'sat'; this.render(ph); }
+    else if (a === 'lane') { s.mode = 'route'; s.lane = +el.dataset.k; this.render(ph); syncSeg('mock'); }
+    else if (a === 'saved') { s.mode = 'draw'; s.pts = [[96, 140], [150, 150], [176, 196], [230, 206], [290, 250]]; this.render(ph); syncSeg('mock'); toast(ph, '已加载「路线 1」'); }
+    else if (a === 'draw') { s.mode = 'draw'; s.pts = []; s.open = false; this.render(ph); syncSeg('mock'); toast(ph, '轻点地图放置路线点'); }
+    else if (a === 'undo') { s.pts.pop(); this.render(ph); }
+    else if (a === 'clear') { s.pts = []; this.render(ph); }
+    else if (a === 'save') { s.saved = 1; toast(ph, '已保存为「路线 1」'); this.render(ph); }
+    else if (a === 'clear-saved') { s.saved = 0; this.render(ph); toast(ph, '已清除保存的路线'); }
+    else if (a === 'loops') { s.loops = Math.max(1, Math.min(20, s.loops + +el.dataset.d)); this.render(ph); }
+    else if (a === 'start') { s.mode = 'run'; s.t = 0; s.open = false; this.render(ph); syncSeg('mock'); }
+    else if (a === 'stop') { s.mode = 'route'; s.t = 0; this.render(ph); syncSeg('mock'); toast(ph, '已停止模拟'); }
+    else if (a === 'devopt') { s.gate = false; this.render(ph); syncSeg('mock'); toast(ph, '（演示）已设置，回到这里'); }
+    else if (a === 'back') toast(ph, '返回工具页');
+  },
+  mapClick(ph, ev) {
+    const s = this.st;
+    if (s.mode === 'run') return;
+    const svg = ph.querySelector('[data-map] svg'), r = svg.getBoundingClientRect();
+    const scale = Math.max(r.width / 390, r.height / 844);
+    const x = (ev.clientX - r.left - (r.width - 390 * scale) / 2) / scale, y = (ev.clientY - r.top - (r.height - 844 * scale) / 2) / scale;
+    if (s.mode !== 'draw') { s.mode = 'draw'; s.pts = []; }
+    s.pts.push([Math.round(x), Math.round(y)]);
+    this.render(ph); syncSeg('mock');
+  },
+};
+
+/* =========================================================
+   出行登记
+   ========================================================= */
+const COUNTIES = ['历下区', '市中区', '槐荫区', '天桥区', '历城区', '长清区', '章丘区', '济阳区'];
+const MODES = ['公交车', '地铁', '出租车 / 网约车', '私家车', '火车', '长途汽车', '步行 / 骑行'];
+TOOLS.travel = {
+  title: '出行登记', h: 185, icon: 'luggage',
+  states: [['connect', '连接'], ['verify', '验证中'], ['form', '填表'], ['done', '提交成功'], ['fail', '未能完成']],
+  st: { view: 'connect', step: 2, pairOpen: false, busy: false, log: false, remember: true, dup: true,
+        f: { day: 20, out: '08:00', back: '18:00', county: 0, mode: 0, place: '济南西站', reason: '周末回家', phone: '139 0000 0000' }, err: {} },
+  stateName() { return this.st.view; },
+  setState(m) { const s = this.st; s.view = m; s.busy = false; if (m === 'connect') s.step = 2; },
+  render(ph) {
+    const s = this.st, v = ph.querySelector('.view');
+    clearTimeout(this._auto);
+    const help = `<button class="ic" data-act="help" aria-label="使用指南">${ico('help')}</button>`;
+    if (s.view === 'connect') {
+      const st = (n) => n < s.step ? 'done' : n === s.step ? 'cur' : 'todo';
+      const sn = (n) => `<span class="sn">${n < s.step ? ico('check') : n}</span>`;
+      const pair = s.pairOpen ? `<div class="list">
+          <label class="inp"><span>配对端口</span><input class="num" inputmode="numeric" placeholder="配对窗口里冒号后的数字"></label>
+          <label class="inp"><span>配对码</span><input class="num" inputmode="numeric" placeholder="六位数字"></label></div>
+          <button class="btn ink" data-act="pair">配对 QLIT</button>` : '';
+      v.innerHTML = page({ title: '出行登记', sub: '先连上本机的无线调试，再去微信验证身份', actions: help, body: `
+        <ol class="steps">
+          <li class="step ${s.pairOpen ? 'cur' : st(1)}">${s.pairOpen ? '<span class="sn">1</span>' : sn(1)}<div class="sb">
+            <div class="sh"><b>配对 QLIT</b>${s.step > 1 ? `<button class="tbtn" data-act="repair">${s.pairOpen ? '收起' : '重新配对'}</button>` : ''}</div>
+            <p>${s.pairOpen ? '开发者选项 → 无线调试 → 使用配对码配对设备，和 QLIT 分屏，保持窗口打开。' : '已完成首次配对，以后不用再配'}</p>${pair}</div></li>
+          <li class="step ${st(2)}">${sn(2)}<div class="sb">
+            <div class="sh"><b>连接无线调试</b>${s.step > 2 ? '<button class="tbtn" data-act="reconnect">更换端口</button>' : ''}</div>
+            ${s.step > 2 ? '<p>已连接本机</p>' : `<p>回到无线调试主页，填「IP 地址和端口」冒号后的数字。它和配对端口不一样。</p>
+            <div class="list"><label class="inp"><span>连接端口</span><input class="num" inputmode="numeric" value="37425"><span class="chip" style="--h:150">已自动填入</span></label></div>
+            ${s.busy ? '<div class="fb"><span class="spin"></span>正在连接本机…</div>' : ''}
+            <button class="btn ink" data-act="connect" ${s.busy ? 'disabled' : ''}>连接</button>`}</div></li>
+          <li class="step ${st(3)}">${sn(3)}<div class="sb">
+            <div class="sh"><b>微信验证</b></div>
+            <p>把调试链接发到任意微信聊天里打开并开启调试，再进入「齐鲁理工微服务 → 在校生服务平台」。</p>
+            <div class="btnrow" style="margin-top:12px"><button class="btn tonal" data-act="copylink" ${s.step < 3 ? 'disabled' : ''}>${ico('link')}复制链接</button><button class="btn ink" data-act="verify" ${s.step < 3 ? 'disabled' : ''}>开始验证</button></div></div></li>
+        </ol>
+        <p class="foot" style="margin-top:0">验证结束后会断开连接。配对码不保存，系统授权可在「已配对设备」里撤销。</p>
+        <div style="margin:-8px 22px 0"><button class="tbtn" data-act="shizuku">改用 Shizuku 连接</button></div>` });
+    } else if (s.view === 'verify') {
+      v.innerHTML = page({ title: '出行登记', actions: help, body: `
+        <div class="wait"><span class="spin"></span><h2>等你在微信里登录</h2><p>QLIT 会在后台读取登录结果，完成后自动回来。</p></div>
+        <ol class="howto"><li>切到微信，打开「齐鲁理工微服务」公众号</li><li>进入「在校生服务平台」，正常登录</li><li>回到 QLIT，自动进入填表</li></ol>
+        <div style="margin:0 16px"><button class="btn tonal" data-act="stopverify">停止验证</button></div>
+        <button class="logtg${s.log ? ' open' : ''}" data-act="log">${s.log ? '收起日志' : '查看日志'}${ico('chevD')}</button>
+        ${s.log ? '<pre class="log">▶ 已连接 127.0.0.1:37425\n▶ 正在寻找微信调试端口…\n✓ 找到校园平台页面\n▶ 等待登录完成…</pre>' : ''}` });
+      clearTimeout(this._auto); this._auto = later(ph, () => { if (s.view === 'verify') { s.view = 'form'; this.render(ph); syncSeg('travel'); toast(ph, '身份验证成功'); } }, 4200);
+    } else if (s.view === 'form') {
+      const f = s.f, e = s.err;
+      const wd = '日一二三四五六'[new Date(2026, 9, f.day).getDay()];
+      v.innerHTML = page({ title: '出行登记', actions: help, body: `
+        <section class="card who"><span class="avatar">林</span><div><b>林同学</b><span>推荐时间 <span class="num">08:00 – 18:00</span>，超出只提醒</span></div></section>
+        ${s.dup ? `<div class="notice seal">${ico('warning')}<div>服务端已有 <b class="num">1</b> 条 <b>10月${f.day}日</b> 的登记，确认不是重复提交。</div></div>` : ''}
+        <div class="group"><h3>时间</h3><div class="list">
+          <button class="row" data-act="pick-day"><span class="tx"><b>出行日期</b></span><span class="val"><span class="num">10月${f.day}日</span> 周${wd}</span>${ico('chevR', 'chev')}</button>
+          <button class="row" data-act="pick-time" data-k="out"><span class="tx"><b>离校时间</b></span><span class="val"><span class="num">${f.out}</span></span>${ico('chevR', 'chev')}</button>
+          <button class="row" data-act="pick-time" data-k="back"><span class="tx"><b>返校时间</b></span><span class="val"><span class="num">${f.back}</span></span>${ico('chevR', 'chev')}</button>
+        </div></div>
+        <div class="group"><h3>去向</h3><div class="list">
+          <button class="row" data-act="pick-list" data-k="county"><span class="tx"><b>出行区县</b></span><span class="val">${COUNTIES[f.county]}</span>${ico('chevR', 'chev')}</button>
+          <button class="row" data-act="pick-list" data-k="mode"><span class="tx"><b>出行方式</b></span><span class="val">${MODES[f.mode]}</span>${ico('chevR', 'chev')}</button>
+          <label class="inp"><span>出行地点</span><input data-in="place" value="${esc(f.place)}" placeholder="例如 济南西站">${e.place ? '<em class="err">请填写出行地点</em>' : ''}</label>
+          <label class="inp"><span>出行事由</span><input data-in="reason" value="${esc(f.reason)}" placeholder="例如 周末回家">${e.reason ? '<em class="err">请填写出行事由</em>' : ''}</label>
+        </div></div>
+        <div class="group"><h3>联系</h3><div class="list">
+          <label class="inp"><span>紧急电话</span><input class="num" data-in="phone" inputmode="tel" value="${esc(f.phone)}" placeholder="家长或本人电话">${e.phone ? '<em class="err">请填写紧急电话</em>' : ''}</label>
+          <label class="row"><span class="tx"><b>记住地点、事由和电话</b><span>下次自动填好</span></span><input type="checkbox" class="switch" data-act="remember" ${s.remember ? 'checked' : ''}></label>
+        </div></div>`,
+        dock: `<button class="btn ink" data-act="check">检查并提交</button>` });
+    } else if (s.view === 'done' || s.view === 'fail') {
+      const ok = s.view === 'done';
+      v.innerHTML = page({ title: '出行登记', short: true, body: `
+        <div class="result"><span class="rs${ok ? '' : ' fail'}">${ico(ok ? 'check' : 'warning')}</span>
+          <h2>${ok ? '提交成功' : '没能提交'}</h2>
+          <p>${ok ? `10月${s.f.day}日 <span class="num">${s.f.out}</span> 离校、<span class="num">${s.f.back}</span> 返校<br>去往 ${esc(s.f.place)}，已提交到学校。` : '登录已经失效，需要重新到微信验证一次身份。<br>刚才填的内容会保留。'}</p></div>`,
+        dock: `<div class="btnrow"><button class="btn tonal" data-act="back">返回</button><button class="btn ink" data-act="${ok ? 'again' : 'reverify'}">${ok ? '再登记一次' : '重新验证'}</button></div>` });
+    }
+    bindScroll(ph);
+  },
+  act(a, el, ph) {
+    const s = this.st;
+    if (a === 'connect') { s.busy = true; this.render(ph); later(ph, () => { s.busy = false; s.step = 3; this.render(ph); toast(ph, '已连接本机'); }, 1000); }
+    else if (a === 'repair') { s.pairOpen = !s.pairOpen; this.render(ph); }
+    else if (a === 'pair') { s.pairOpen = false; this.render(ph); toast(ph, '配对成功'); }
+    else if (a === 'reconnect') { s.step = 2; this.render(ph); }
+    else if (a === 'copylink') toast(ph, '调试链接已复制，发到微信里打开');
+    else if (a === 'verify') { s.view = 'verify'; this.render(ph); syncSeg('travel'); }
+    else if (a === 'stopverify') { s.view = 'connect'; this.render(ph); syncSeg('travel'); toast(ph, '已停止验证'); }
+    else if (a === 'log') { s.log = !s.log; this.render(ph); }
+    else if (a === 'shizuku') toast(ph, 'Shizuku 方式也用同样的步骤卡');
+    else if (a === 'help') openSheet(ph, `<h2>无线调试使用指南</h2>
+        <ol class="howto" style="margin:16px 0 0;padding:4px 16px;background:var(--bg)"><li><b>首次配对</b>：连 Wi-Fi，开发者选项 → 无线调试 → 使用配对码配对设备。和 QLIT 分屏，填配对端口和六位码。</li><li><b>连接本机</b>：关掉配对窗口，用无线调试主页的端口连接。重启或换 Wi-Fi 后端口会变。</li><li><b>微信验证</b>：微信里打开调试链接并开启调试，再进入在校生服务平台登录。</li></ol>
+        <p class="sh-sub" style="margin-top:14px">找不到开发者选项？一般在「设置 → 关于手机」里连点版本号打开。</p>
+        <div class="actions"><button class="btn tonal" data-act="copylink">${ico('link')}复制链接</button><button class="btn ink" data-act="close-sheet">知道了</button></div>`);
+    else if (a === 'remember') s.remember = el.checked;
+    else if (a === 'pick-time') {
+      const k = el.dataset.k, cur = s.f[k].split(':');
+      const col = (arr, sel, name) => `<div class="wcol" data-col="${name}">${arr.map(x => `<button class="${x === sel ? 'on' : ''}" data-act="wsel" data-v="${x}">${x}</button>`).join('')}</div>`;
+      openSheet(ph, `<h2>${k === 'out' ? '离校时间' : '返校时间'}</h2><p class="sh-sub">推荐 <span class="num">08:00 – 18:00</span>，超出也能提交</p>
+        <div class="wheel">${col(Array.from({ length: 24 }, (_, i) => pad(i)), cur[0], 'h')}${col(Array.from({ length: 12 }, (_, i) => pad(i * 5)), cur[1], 'm')}</div>
+        <div class="actions"><button class="btn tonal" data-act="close-sheet">取消</button><button class="btn ink" data-act="time-ok" data-k="${k}">确定</button></div>`);
+      requestAnimationFrame(() => ph.querySelectorAll('.wcol button.on').forEach(b => b.parentElement.scrollTop = b.offsetTop - 88));
+    }
+    else if (a === 'wsel') { const c = el.parentElement; c.querySelectorAll('button').forEach(b => b.classList.toggle('on', b === el)); c.scrollTo({ top: el.offsetTop - 88, behavior: 'smooth' }); }
+    else if (a === 'time-ok') { const h = ph.querySelector('[data-col="h"] .on').dataset.v, m = ph.querySelector('[data-col="m"] .on').dataset.v; s.f[el.dataset.k] = `${h}:${m}`; closeSheet(ph); this.render(ph); }
+    else if (a === 'pick-day') {
+      const first = new Date(2026, 9, 19);
+      let cells = '日一二三四五六'.split('').map(w => `<span class="wd">${w}</span>`).join('');
+      const lead = (first.getDay() + 7) % 7;
+      cells += '<span></span>'.repeat(lead);
+      for (let d = 19; d <= 1 + 31; d++) { const day = d > 31 ? d - 31 : d; if (d > 32) break; cells += `<button class="${d === 20 ? 'today ' : ''}${d === s.f.day ? 'on' : ''}" data-act="day" data-d="${d}" ${d > 31 ? 'disabled' : ''}>${day}</button>`; }
+      openSheet(ph, `<h2>出行日期</h2><p class="sh-sub">红字是今天</p><div class="dgrid">${cells}</div>`);
+    }
+    else if (a === 'day') { s.f.day = +el.dataset.d; s.dup = s.f.day === 20; closeSheet(ph); this.render(ph); }
+    else if (a === 'pick-list') {
+      const k = el.dataset.k, arr = k === 'county' ? COUNTIES : MODES;
+      openSheet(ph, `<h2>${k === 'county' ? '出行区县' : '出行方式'}</h2><div class="list">${arr.map((x, i) => `<button class="row" data-act="lsel" data-k="${k}" data-i="${i}"><span class="tx"><b style="font-weight:500">${x}</b></span><span class="radio${s.f[k] === i ? ' on' : ''}"></span></button>`).join('')}</div>`);
+    }
+    else if (a === 'lsel') { s.f[el.dataset.k] = +el.dataset.i; later(ph, () => { closeSheet(ph); this.render(ph); }, 150); el.querySelector('.radio').classList.add('on'); }
+    else if (a === 'check') {
+      const f = s.f; s.err = { place: !f.place.trim(), reason: !f.reason.trim(), phone: !f.phone.trim() };
+      if (Object.values(s.err).some(Boolean)) { this.render(ph); return toast(ph, '还有内容没填'); }
+      const warns = [];
+      if (s.dup) warns.push(`服务端已有 1 条 10月${f.day}日 的登记`);
+      if (f.out < '08:00' || f.back > '18:00') warns.push('时间超出推荐范围 08:00 – 18:00');
+      openSheet(ph, `<h2>确认提交出行登记</h2>
+        <dl class="kv"><dt>出行日期</dt><dd><span class="num">10月${f.day}日</span></dd><dt>离校</dt><dd><span class="num">${f.out}</span></dd><dt>返校</dt><dd><span class="num">${f.back}</span></dd>
+          <dt>区县</dt><dd>${COUNTIES[f.county]}</dd><dt>方式</dt><dd>${MODES[f.mode]}</dd><dt>地点</dt><dd>${esc(f.place)}</dd><dt>事由</dt><dd>${esc(f.reason)}</dd><dt>紧急电话</dt><dd><span class="num">${esc(f.phone)}</span></dd></dl>
+        ${warns.length ? `<div class="warns">${warns.map(w => `<div class="notice seal">${ico('warning')}<div>${w}</div></div>`).join('')}</div>` : ''}
+        <div class="actions"><button class="btn tonal" data-act="close-sheet">返回修改</button><button class="btn ink" data-act="submit">提交</button></div>`);
+    }
+    else if (a === 'submit') { el.innerHTML = '<span class="spin"></span>正在提交'; el.disabled = true; later(ph, () => { closeSheet(ph); s.view = 'done'; this.render(ph); syncSeg('travel'); }, 900); }
+    else if (a === 'again') { s.view = 'form'; this.render(ph); syncSeg('travel'); }
+    else if (a === 'reverify') { s.view = 'connect'; s.step = 2; this.render(ph); syncSeg('travel'); }
+    else if (a === 'back') { if (s.view === 'form' || s.view === 'done' || s.view === 'fail') { s.view = 'connect'; this.render(ph); syncSeg('travel'); } else toast(ph, '返回工具页（会断开连接）'); }
+  },
+  input(k, el) { this.st.f[k] = el.value; if (this.st.err[k] && el.value.trim()) { this.st.err[k] = false; el.parentElement.querySelector('.err')?.remove(); } },
+};
+
+/* ---------------- deck assembly ---------------- */
+const NOTES = {
+  pickup: {
+    lede: '打开就是"还有几件没取"，取件码是整页最大的字。去驿站时只做两件事：报取件码，或者出示身份码。',
+    items: [
+      ['<b>取件码当主角</b>：38px 的 Barlow 数字，点整张卡复制；快递公司、驿站、商品名、单号退到第二、三行。', ''],
+      ['<b>悬浮的"码"按钮去掉</b>，改成摘要卡里的"出示身份码"主按钮。待取件数用红色，因为它是要你去做的事。', ''],
+      ['<b>"扫码时调高亮度"挪进身份码弹窗</b>，只在用得到的地方出现。条形码放在白底卡上，深色模式也能扫。', ''],
+      ['<b>需要登录或人机校验</b>时先显示一张说明卡，点按钮后在底部弹窗里打开淘宝网页，完成后自动收起。不再在页面里嵌一块 560dp 的网页。', 'change'],
+      ['<b>首次加载显示骨架</b>，没有包裹时显示空状态卡，不再是一片空白。', ''],
+    ],
+  },
+  bath: {
+    lede: '先看余额和空位，再拿一张红色的"票"。按顺序往下走：看余额、选浴室、选喷头、确认。',
+    items: [
+      ['<b>浴室列表</b>：每行右侧是空位数大数字；满员显示排队人数，维护中单独置灰。余额卡放在最上面，余额不足时变红。', ''],
+      ['<b>浴位示意图按状态上色</b>（空闲 / 占用 / 我的），点空闲的格子直接预约。现在的示意图只有编号。', 'change'],
+      ['<b>预约成功是一张红色的票</b>：喷头号和倒计时最大，进度条随时间缩短；短账号可复制，设备密码默认隐藏。', ''],
+      ['<b>预约页可以返回列表</b>，顶部常驻一条红色提醒，点它回到票。现在在预约页按返回没有反应。取消预约改成先确认。', 'change'],
+      ['<b>排队页</b>用大数字显示前面还有几人；退出登录收进右上角"更多"弹窗，不再常驻顶栏。', ''],
+    ],
+  },
+  mock: {
+    lede: '地图铺满整屏，按钮改成玻璃圆钮。底部面板只有两档：收起时是路线摘要和开始键，展开后才是参数。',
+    items: [
+      ['<b>路线一行选完</b>：1–6 道、我的路线、"自己画"都是同一排胶囊；当前路线的距离、圈数、预计时长写在标题下面。', ''],
+      ['<b>圈数改成 −/+ 步进</b>，速度旁边直接写配速，定位漂移为 0 时显示"关闭"。', ''],
+      ['<b>运行中显示总进度</b>：累计距离、已用时、配速、还剩多久，红点和红色箭头表示正在注入位置。现在只显示单圈距离。', 'change'],
+      ['<b>路线颜色跟底图走</b>：卫星图用白线，矢量图用墨色线，不再用 Material 蓝点。', ''],
+      ['<b>没设模拟位置应用</b>时，提示卡放在面板最上面，开始键置灰。现在是点了开始才报错。', 'change'],
+    ],
+  },
+  travel: {
+    lede: '先把无线调试接好，再填表。三步引导、表单、确认、结果，各自只做一件事。',
+    items: [
+      ['<b>三步引导改成一张竖向步骤卡</b>：做完的折成一行（可"重新配对"），当前步骤展开，后面的置灰。', ''],
+      ['<b>验证中页面</b>只写要做的三件事和"停止验证"，日志默认收起，改成浅色等宽字。', ''],
+      ['<b>表单按"时间 / 去向 / 联系"分组</b>，时间用大号数字；日期、时间、区县、方式都在底部弹窗里选。日期用和今天页一样的日历。', ''],
+      ['<b>重复登记、超出推荐时间</b>用红色提示卡放在表单顶部，确认弹窗里再列一次；缺字段直接标在对应行上。', ''],
+      ['<b>结果页</b>只有一个结论和两个按钮；失败时说明原因，并提示已填内容会保留。', ''],
+    ],
+  },
+};
+const ORDER = ['pickup', 'bath', 'mock', 'travel'];
+const nav = document.getElementById('toolnav'), main = document.getElementById('tools');
+nav.innerHTML = ORDER.map(k => `<a href="#t-${k}"><span class="ticon" style="--h:${TOOLS[k].h}">${ico(TOOLS[k].icon)}</span>${TOOLS[k].title}</a>`).join('') + '<span class="note">电费 · 超星 · 余额流水 · NFC 已完成</span>';
+main.innerHTML = ORDER.map((k, i) => {
+  const t = TOOLS[k], n = NOTES[k];
+  return `<section class="tool" id="t-${k}">
+    <div class="tool-text">
+      <div class="kicker"><span class="ticon" style="--h:${t.h}">${ico(t.icon)}</span><span class="num">0${i + 1}</span>${t.title}</div>
+      <h2>${n.lede.split('：')[0].split('。')[0]}。</h2>
+      <p>${n.lede.includes('。') ? n.lede.slice(n.lede.indexOf('。') + 1) : ''}</p>
+      <ul class="notes">${n.items.map(([h, cls], j) => `<li data-k="${j + 1}" class="${cls}">${h}</li>`).join('')}</ul>
+    </div>
+    <div class="demo">
+      <div class="seg" data-seg="${k}" role="group" aria-label="状态">${t.states.map(([v, l]) => `<button data-state="${v}" aria-pressed="false">${l}</button>`).join('')}</div>
+      <div class="phone" data-tool="${k}">${STATUS}<div class="view"></div><div class="scrim" data-act="close-sheet"></div><div class="sheet" role="dialog" aria-modal="true"></div><div class="toast" role="status"></div><div class="gesture"></div></div>
+      <p class="hint">手机里的按钮都能点</p>
+    </div>
+  </section>`;
+}).join('');
+const phoneOf = (k) => document.querySelector(`.phone[data-tool="${k}"]`);
+function syncSeg(k) { const name = TOOLS[k].stateName(); document.querySelectorAll(`[data-seg="${k}"] button`).forEach(b => b.setAttribute('aria-pressed', b.dataset.state === name)); }
+ORDER.forEach(k => { TOOLS[k].render(phoneOf(k)); syncSeg(k); });
+
+document.addEventListener('click', (e) => {
+  const sb = e.target.closest('[data-seg] button');
+  if (sb) { const k = sb.parentElement.dataset.seg, ph = phoneOf(k); cancelLater(ph); closeSheet(ph); TOOLS[k].setState(sb.dataset.state); TOOLS[k].render(ph); syncSeg(k); return; }
+  const th = e.target.closest('[data-theme-v]');
+  if (th) { document.documentElement.dataset.theme = th.dataset.themeV; document.querySelectorAll('[data-theme-v]').forEach(b => b.setAttribute('aria-pressed', b === th)); TOOLS.mock.drawRoute(phoneOf('mock')); return; }
+  const t = e.target.closest('[data-act]');
+  const ph = e.target.closest('.phone'); if (!ph) return;
+  const tool = TOOLS[ph.dataset.tool];
+  if (!t) { if (ph.dataset.tool === 'mock' && e.target.closest('[data-map]')) tool.mapClick(ph, e); return; }
+  if (t.dataset.act === 'close-sheet') return closeSheet(ph);
+  tool.act(t.dataset.act, t, ph, e);
+});
+document.addEventListener('input', (e) => {
+  const t = e.target.closest('[data-in]'); if (!t) return;
+  const ph = t.closest('.phone'); TOOLS[ph.dataset.tool].input?.(t.dataset.in, t, ph);
+});
+setInterval(() => { TOOLS.bath.tick(phoneOf('bath')); }, 1000);
+setInterval(() => { TOOLS.mock.tick(phoneOf('mock')); }, 120);
+</script>
+</body>
+</html>

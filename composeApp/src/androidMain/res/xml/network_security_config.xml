@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  网络安全配置：默认禁止明文流量，只对仅提供 HTTP 的接口单独放行。
+  替代 Manifest 里全局的 android:usesCleartextTraffic="true"，
+  让其余接口（超星、电费、淘宝、自更新等）强制走 HTTPS。
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+
+    <!-- 校园浴室后台 Hydream 仅提供 HTTP -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">hydream.cn</domain>
+    </domain-config>
+
+    <!-- 出行登记 CDP 桥接：Shizuku UserService 把微信 abstract devtools socket
+         桥到本地随机临时端口，CDP 走明文 HTTP/WebSocket，仅 loopback 不出网。 -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">127.0.0.1</domain>
+        <domain includeSubdomains="false">localhost</domain>
+    </domain-config>
+</network-security-config>

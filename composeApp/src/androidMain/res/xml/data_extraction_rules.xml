@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  数据备份 / 设备迁移规则。
+  允许课表、宿舍信息等非敏感数据随账号迁移，但把所有含登录凭证、
+  cookie 的 SharedPreferences 排除掉，避免它们被备份到云端或迁移到新设备。
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <!-- Hydream：token / session_id / 手机号 / 密码 / 验证码 -->
+        <exclude domain="sharedpref" path="hydream_prefs.xml" />
+        <!-- 超星：.chaoxing.com 登录 cookie -->
+        <exclude domain="sharedpref" path="chaoxing_cookie_prefs.xml" />
+        <!-- 超星：账号密码（加密 prefs，用于自动重登） -->
+        <exclude domain="sharedpref" path="chaoxing_secure_prefs.xml" />
+        <!-- 出行登记：JSESSIONID 与用户主动记住的电话/地点/事由 -->
+        <exclude domain="sharedpref" path="qlit_travel_secrets.xml" />
+        <exclude domain="sharedpref" path="qlit_travel_secrets_fallback.xml" />
+        <exclude domain="sharedpref" path="qlit_travel_secrets_fallback.xml.bak" />
+        <exclude domain="sharedpref" path="qlit_travel_preferences.xml" />
+        <exclude domain="sharedpref" path="qlit_wireless_adb.xml" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="sharedpref" path="hydream_prefs.xml" />
+        <exclude domain="sharedpref" path="chaoxing_cookie_prefs.xml" />
+        <exclude domain="sharedpref" path="chaoxing_secure_prefs.xml" />
+        <exclude domain="sharedpref" path="qlit_travel_secrets.xml" />
+        <exclude domain="sharedpref" path="qlit_travel_secrets_fallback.xml" />
+        <exclude domain="sharedpref" path="qlit_travel_secrets_fallback.xml.bak" />
+        <exclude domain="sharedpref" path="qlit_travel_preferences.xml" />
+        <exclude domain="sharedpref" path="qlit_wireless_adb.xml" />
+    </device-transfer>
+</data-extraction-rules>

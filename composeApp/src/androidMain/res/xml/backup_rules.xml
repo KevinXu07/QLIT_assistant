@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android 11 及以下的完整备份规则（API < 31 走这个文件）。
+  与 data_extraction_rules.xml 保持一致：只排除含凭证的 prefs。
+-->
+<full-backup-content>
+    <exclude domain="sharedpref" path="hydream_prefs.xml" />
+    <exclude domain="sharedpref" path="chaoxing_cookie_prefs.xml" />
+    <exclude domain="sharedpref" path="chaoxing_secure_prefs.xml" />
+    <exclude domain="sharedpref" path="qlit_travel_secrets.xml" />
+    <!-- Remove any plaintext fallback left by an older development build. -->
+    <exclude domain="sharedpref" path="qlit_travel_secrets_fallback.xml" />
+    <exclude domain="sharedpref" path="qlit_travel_secrets_fallback.xml.bak" />
+    <!-- Legacy travel setup preferences remain local to this device. -->
+    <exclude domain="sharedpref" path="qlit_travel_preferences.xml" />
+    <exclude domain="sharedpref" path="qlit_wireless_adb.xml" />
+</full-backup-content>

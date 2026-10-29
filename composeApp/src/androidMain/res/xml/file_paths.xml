@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- 对应 context.externalCacheDir -->
+    <external-cache-path name="update_apk" path="." />
+    <!-- 为了保险，可以把普通缓存也加上 -->
+    <cache-path name="internal_cache" path="." />
+</paths>
